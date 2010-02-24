@@ -1,0 +1,30 @@
+A custom JS script to enhance http://www.allegro.cc forums.
+Copyright © 2010 Brandon McCaig
+
+This script is used to "enhance" the user experience on the forums at
+http://www.allegro.cc. You may hotlink it[1], copy it, modify it, or
+distribute it; but I ask that if you do copy or modify it, you leave
+this copyright notice intact.
+
+Original location: http://www.castopulence.org/js/acc.js
+Minified: http://www.castopulence.org/js/acc.min.js
+
+It depends on jQuery and jQuery UI. Be sure to add both
+to the list of external JavaScript scripts before this script. A
+convenient way is by using the Google API servers, which Google
+encourages you to do anyway[2].
+
+For example, add the following lines to your external JavaScript
+script list:
+
+http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js
+http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js
+http://www.castoulence.org/js/acc.min.js
+
+As one might expect, it comes with NO WARRANTY, etc. USE AT OWN RISK.
+Also note that it may periodically break as I develop live so you
+might experience issues on http://www.allegro.cc if you're hotlinking
+(or otherwise using a broken version). ^_^ I am not to be held liable
+for this.
+
+

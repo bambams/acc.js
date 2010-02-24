@@ -1,0 +1,378 @@
+/*
+ * A custom JS script to enhance http://www.allegro.cc forums.
+ * Copyright © 2010 Brandon McCaig
+ *
+ * This script is used to "enhance" the user experience on the forums at
+ * http://www.allegro.cc. You may hotlink it[1], copy it, modify it, or
+ * distribute it; but I ask that if you do copy or modify it, you leave
+ * this copyright notice intact.
+ *
+ * Original location: http://www.castopulence.org/js/acc.js
+ * Minified: http://www.castopulence.org/js/acc.min.js
+ *
+ * It depends on jQuery and jQuery UI. Be sure to add both
+ * to the list of external JavaScript scripts before this script. A
+ * convenient way is by using the Google API servers, which Google
+ * encourages you to do anyway[2].
+ *
+ * For example, add the following lines to your external JavaScript
+ * script list:
+ *
+ * http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js
+ * http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js
+ * http://www.castoulence.org/js/acc.min.js
+ *
+ * As one might expect, it comes with NO WARRANTY, etc. USE AT OWN RISK.
+ * Also note that it may periodically break as I develop live so you
+ * might experience issues on http://www.allegro.cc if you're hotlinking
+ * (or otherwise using a broken version). ^_^ I am not to be held liable
+ * for this.
+ *
+ * [1] At least until I see how it affects my bandwidth, but I can't
+ * imagine it will hurt it any. If you do hotlink, check this notice
+ * periodically to see if I've changed my mind or risk me taking
+ * advantage. ^_^
+ *
+ * [2] http://code.google.com/apis/ajaxlibs/documentation/
+ */
+jQuery.noConflict();
+
+bam = {
+    exceptionDialogCount: 0,
+
+    cloneBr:
+        function(e)
+        {
+            e.replaceWith(function() {
+                return "\n";
+            });
+        },
+
+    cloneCode:
+        function(e)
+        {
+            e.replaceWith(function() {
+                var e = jQuery(this);
+
+                return "<code>" +
+                        (e.hasClass("snippet") ? "\n" : "") +
+                        e.text().trim() +
+                        (e.hasClass("snippet") ? "\n" : "") +
+                        "</code>";
+            });
+        },
+
+    cloneCuss:
+        function(e)
+        {
+            e.replaceWith(function() {
+                return jQuery(this).text();
+            });
+        },
+
+    cloneParagraph:
+        function(e)
+        {
+            e.replaceWith(function() {
+                return jQuery(this).html() + "\n\n";
+            });
+        },
+
+    clonePost:
+        function(post)
+        {
+            var mockup = post.mockup.clone();
+
+            this.stripUrlDisclaimers(mockup);
+
+            mockup.find("div.quote_container").each(function() {
+                bam.cloneQuote(jQuery(this));
+            });
+
+            mockup.find(".source-code").each(function() {
+                bam.cloneCode(jQuery(this));
+            });
+
+            mockup.find("div.youtube").each(function() {
+                bam.cloneYouTube(jQuery(this));
+            });
+
+            mockup.find("img").each(function() {
+                var e = jQuery(this);
+
+                if(/^http:\/\/www\.allegro\.cc\/forums\/smileys\//.test(
+                        e.attr("src")))
+                {
+                    bam.cloneSmiley(e);
+                }
+            });
+
+            mockup.find("p").each(function() {
+                bam.cloneParagraph(jQuery(this));
+            });
+
+            mockup.find("span.cuss").each(function() {
+                bam.cloneCuss(jQuery(this));
+            });
+
+            mockup.find("span.ref").each(function() {
+                bam.cloneReference(jQuery(this));
+            });
+
+            this.stripReferenceBlock(mockup);
+
+            return mockup.html();
+        },
+
+    cloneQuote:
+        function(e)
+        {
+            e.replaceWith(function() {
+                var fmt = "<quote{name}{src}>{body}</quote>";
+                var quote = bam.getQuote(jQuery(this));
+
+                return fmt
+                        .replace("{name}", quote.name ?
+                        " name=\"" + bam.htmlEncode(quote.name) +
+                        "\"" : "").replace("{src}", quote.src ?
+                        " src=\"" + bam.htmlEncode(quote.src) +
+                        "\"" : "").replace("{body}", quote.body);
+            });
+        },
+
+    cloneReference:
+        function(e)
+        {
+            e.replaceWith(function() {
+                var e = jQuery(this);
+                var i = e.find("a").text() | 0;
+                var ref = e.parents(".mockup").find(
+                        ".ref-block li:nth-child(" + i + ")");
+
+                //bam.stripUrlDisclaimers(ref);
+
+                return "<ref>" + ref.html() + "</ref>";
+            });
+        },
+
+    cloneSmiley:
+        function(e)
+        {
+            e.replaceWith(function() {
+                return jQuery(this).attr("alt");
+            });
+        },
+
+    cloneYouTube:
+        function(e)
+        {
+            //e.replaceWith(function() {
+                //return "<object data=\"" +
+                        //jQuery(this).find("a").attr("href") +
+                        //"\"></object>";
+            //});
+            e.replaceWith(function() {
+                return "\\[" + jQuery(this).find("a").attr("href") + "]";
+            });
+        },
+
+    htmlDecode:
+        function(s)
+        {
+            return s.replace("&quot;", "\"")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", "&");
+        },
+
+    htmlEncode:
+        function(s)
+        {
+            return s.replace("&", "&amp;").replace("'", "&#39;")
+                    .replace("\"", "&quot;").replace("<", "&lt;")
+                    .replace(">", "&gt;");
+        },
+
+    getPost:
+        function(e)
+        {
+            var p;
+
+            if(e instanceof Number)
+                e = jQuery("#post-" + id);
+            else if(!(e instanceof jQuery))
+                e = jQuery(e);
+
+            p = {
+                originator: e.find(".originator").text(),
+                memberNumber: e.find(".member-number").text().replace(
+                        "Member #", "") | 0,
+                header: e.find(".header"),
+                id: e.get(0).id.replace("post-", "") | 0,
+                mockup: e.find("td.content > div > .mockup"),
+                post: e,
+                src: e.find(".posted-on > a").get(0).href
+            };
+
+            if(e.length != 1 || p.header.length != 1 ||
+                    p.mockup.length != 1)
+            {
+                throw new Error("Invalid argument 'e'. Must be a " +
+                        "Number (the post id) or a jQuery object with " +
+                        "just the post element selected.");
+            }
+
+            return p;
+        },
+
+    getQuote:
+        function(e)
+        {
+            var name;
+            var p;
+            var q;
+            var src;
+
+            if(!(e instanceof jQuery))
+                e = jQuery(e);
+
+            name = (name = (name = e.find(".title")) && name.text()) &&
+                    name.replace(/ said:$/, "");
+            src = e.find(".title > a").attr("href");
+
+            if(/^#post-(\d+)/.test(src))
+                src = jQuery(src + " .posted-on a").attr("href");
+
+            q = {
+                body: e.find(".quote").text().trim(),
+                name: name && name.trim() || "",
+                src: src && src.trim() || ""
+            };
+
+            return q;
+        },
+
+    quote:
+        function(id)
+        {
+            var post = this.getPost(jQuery("#post-" + id));
+            var body = jQuery("#mub-body");
+            var quote = this.clonePost(post).trim();
+
+            body.val(body.val() +
+                    (body.val().length != 0 ? "\n" : "") +
+                    "<quote name=\"" + post.originator +
+                    "\" src=\"" + post.src + "\">\n" +
+                    quote +
+                    (quote[quote.length - 1] != "\n" ?
+                    "\n" : "") +
+                    "</quote>");
+        },
+
+    showException:
+        function(ex)
+        {
+            var e = jQuery(document.body).append(
+                    "<div class=\".bam-exception-dialog\" " +
+                    "title=\"Unhandled Exception Caught\">" +
+                    "<p>The following exception was thrown and not " +
+                    "handled:</p><p>" +
+                    ex.message +
+                    "</p>" + (jQuery.isFunction(ex.toSource) ?
+                    "<a href=\"javascript:bam.showExceptionVerbose(" +
+                    this.exceptionDialogCount +
+                    ");\">Show complete exception.</a><p " +
+                    "class=\".bam-verbose\">" +
+                    ex.toSource() +
+                    "</p>" : "") +
+                    "</div>");
+
+            e.get(0).id = "bam-exception-dialog|" +
+                    this.exceptionDialogCount;
+            e.find(".bam-verbose").hide();
+
+            this.exceptionDialogCount++;
+        },
+
+    showExeptionVerbose:
+        function(id)
+        {
+            var e = jQuery("#bam-exception-dialog|" + id);
+
+            if(e.length != 1)
+            {
+                throw new Error("Failed to find exception dialog '" +
+                        id +
+                        "'.");
+            }
+
+            e.find(".bam-verbose").fadeIn("slow");
+        },
+
+    stripReferenceBlock:
+        function(e)
+        {
+            e.find(".ref-block").remove();
+        },
+
+    stripUrlDisclaimers:
+        function(e)
+        {
+            /*
+             * Remove those "[domain]" warnings that are automatically
+             * added after hyperlinks on the backend.
+             */
+            e.find("span.url").remove();
+        },
+
+    /*
+     * It's very hard to get the quoting perfect so as an alternative,
+     * this method just appends correct <quote> tags, with name and src,
+     * without actually adding any quoted content. This leaves the
+     * quoting up to you, but saves you the trouble of scrolling back and
+     * forth on the page to copy the username/hyperlink.
+     */
+    stub:
+        function(id)
+        {
+            var post = this.getPost(jQuery("#post-" + id));
+            var body = jQuery("#mub-body");
+
+            body.val(body.val() +
+                    (body.val().length != 0 ? "\n" : "") +
+                    "<quote name=\"" + post.originator +
+                    "\" src=\"" + post.src + "\">\n" +
+                    "\n" +
+                    "</quote>");
+        }
+}
+
+jQuery(function() {
+    // Navigation menu additions.
+    jQuery("#forum-navigation").append("<a " +
+            "href=\"/cc/theme-css\" " +
+            "title=\"View/edit my custom CSS/JS.\">css/js</a> | " +
+            "<a " +
+            "href=\"https://www.allegro.cc/pm\" " +
+            "id=\"my-pm-link\" " +
+            "title=\"Your private message inbox.\">inbox</a> | " +
+            "<a " +
+            "href=\"/cc/forums-settings\" " +
+            "id=\"my-settings-link\" " +
+            "title=\"View/edit your forum settings.\">settings</a>");
+
+    // Post header additions.
+    jQuery("#thread .post").each(function(E) {
+        var o = bam.getPost(jQuery(this));
+
+        o.header.append("<a href=\"#post_form\" " +
+                "title=\"Jump to the mockup box.\">Mockup</a> " +
+                "<a href=\"javascript:bam.quote(" +
+                o.id +
+                ");\" title=\"Quote this post.\">Quote</a> " +
+                "<a href=\"javascript:bam.stub(" +
+                o.id +
+                ");\" title=\"Stub quote this post.\">Stub</a>");
+    });
+});
+
