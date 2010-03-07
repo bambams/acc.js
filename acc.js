@@ -84,6 +84,11 @@ bam = {
             var mockup = post.mockup.clone();
 
             this.stripUrlDisclaimers(mockup);
+            this.trimWhitespace(mockup);
+
+            mockup.find("br").each(function() {
+                bam.cloneBr(jQuery(this));
+            });
 
             mockup.find("div.quote_container").each(function() {
                 bam.cloneQuote(jQuery(this));
@@ -120,6 +125,7 @@ bam = {
             });
 
             this.stripReferenceBlock(mockup);
+            this.stripXhtmlXmlnsAttribute(mockup);
 
             return mockup.html();
         },
@@ -325,6 +331,13 @@ bam = {
             e.find("span.url").remove();
         },
 
+    stripXhtmlXmlnsAttribute:
+        function(e)
+        {
+            e.find("*[xmlns='http://www.w3.org/1999/xhtml']").removeAttr(
+                    "xmlns");
+        },
+
     /*
      * It's very hard to get the quoting perfect so as an alternative,
      * this method just appends correct <quote> tags, with name and src,
@@ -344,18 +357,43 @@ bam = {
                     "\" src=\"" + post.src + "\">\n" +
                     "\n" +
                     "</quote>");
+        },
+
+    trimWhitespace:
+        function(e)
+        {
+            e.contents().filter(function() {
+                var e = jQuery(this);
+
+                if(this.nodeType == (Node && Node.TEXT_NODE || 3))
+                    e.val(e.val().trim());
+            });
         }
 }
 
 jQuery(function() {
+    /*
+     * Navigation menu width. Wider to avoid moving content down (it can
+     * be annoying when you're trying to click and link and it suddently
+     * jolts down as this JS runs in the background). Of course, on
+     * smaller screens, this can be a problem. Maybe eventually support
+     * can be added for a configuration menu to control this.
+     */
+    jQuery("table[summary='forum header'] td:nth-child(2)").width(600);
+
     // Navigation menu additions.
-    jQuery("#forum-navigation").append("<a " +
+    jQuery("#forum-navigation").find("a:nth-child(5)").after(
+            " | <a " +
             "href=\"/cc/theme-css\" " +
             "title=\"View/edit my custom CSS/JS.\">css/js</a> | " +
             "<a " +
             "href=\"https://www.allegro.cc/pm\" " +
-            "id=\"my-pm-link\" " +
+            "id=\"my-inbox-link\" " +
             "title=\"Your private message inbox.\">inbox</a> | " +
+            "<a " +
+            "href=\"https://www.allegro.cc/pm/list/outbox\" " +
+            "id=\"my-outbox-link\" " +
+            "title=\"Your private message outbox.\">outbox</a> | " +
             "<a " +
             "href=\"/cc/forums-settings\" " +
             "id=\"my-settings-link\" " +
