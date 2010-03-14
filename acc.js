@@ -379,7 +379,7 @@ jQuery(function() {
      * smaller screens, this can be a problem. Maybe eventually support
      * can be added for a configuration menu to control this.
      */
-    jQuery("table[summary='forum header'] td:nth-child(2)").width(600);
+    jQuery("table[summary='forum header'] td:nth-child(2)").width(650);
 
     // Navigation menu additions.
     jQuery("#forum-navigation").find("a:nth-child(5)").after(
@@ -394,6 +394,10 @@ jQuery(function() {
             "href=\"https://www.allegro.cc/pm/list/outbox\" " +
             "id=\"my-outbox-link\" " +
             "title=\"Your private message outbox.\">outbox</a> | " +
+            "<a " +
+            "href=\"http://www.allegro.cc/pm/compose/\" " +
+            "id=\"my-compose-link\" " +
+            "title=\"Compose a new private message.\">compose</a> | " +
             "<a " +
             "href=\"/cc/forums-settings\" " +
             "id=\"my-settings-link\" " +
