@@ -185,18 +185,19 @@ bam = {
     htmlDecode:
         function(s)
         {
-            return s.replace("&quot;", "\"")
-                .replace("&lt;", "<")
-                .replace("&gt;", ">")
-                .replace("&amp;", "&");
+            return s.replace(/&quot;/g, "\"")
+                .replace(/&lt;/g, "<")
+                .replace(/&gt;/g, ">")
+                .replace(/&#39;/g, "'")
+                .replace(/&amp;/g, "&");
         },
 
     htmlEncode:
         function(s)
         {
-            return s.replace("&", "&amp;").replace("'", "&#39;")
-                    .replace("\"", "&quot;").replace("<", "&lt;")
-                    .replace(">", "&gt;");
+            return s.replace(/&/g, "&amp;").replace(/'/g, "&#39;")
+                    .replace(/"/g, "&quot;").replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
         },
 
     getPost:
