@@ -134,7 +134,7 @@ bam = {
         function(e)
         {
             e.replaceWith(function() {
-                var fmt = "<quote{name}{src}>{body}</quote>";
+                var fmt = "<quote{name}{src}>{body}</quote>\n";
                 var quote = bam.getQuote(jQuery(this));
 
                 return fmt
