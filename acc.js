@@ -404,6 +404,18 @@ jQuery(function() {
             "id=\"my-settings-link\" " +
             "title=\"View/edit your forum settings.\">settings</a>");
 
+    // Last-read links.
+    jQuery("#thread-list").find("span.topic a").each(function() {
+        var e = jQuery(this);
+        var clone = e.clone();
+
+        clone.text("Top");
+        clone.attr("style", clone.attr("style") + "; float: right; margin-right: 1em;");
+
+        e.attr("href", e.attr("href") + "#last_read");
+        e.after(clone);
+    });
+
     // Post header additions.
     jQuery("#thread .post").each(function(E) {
         var o = bam.getPost(jQuery(this));
