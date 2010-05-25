@@ -298,6 +298,13 @@ bam = {
                     this.exceptionDialogCount;
             e.find(".bam-verbose").hide();
 
+            e.dialog({
+                close:
+                    function() {
+                        jQuery(this).remove();
+                    }
+            });
+
             this.exceptionDialogCount++;
         },
 
