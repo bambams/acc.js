@@ -436,5 +436,12 @@ jQuery(function() {
                 o.id +
                 ");\" title=\"Stub quote this post.\">Stub</a>");
     });
+
+    // Add title attribute to cusses. ;)
+    jQuery("span.cuss").each(function() {
+        var e = jQuery(this);
+
+        e.attr("title", e.text());
+    });
 });
 
