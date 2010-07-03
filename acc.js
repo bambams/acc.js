@@ -415,7 +415,10 @@ jQuery(function() {
     jQuery("#thread-list").find("span.topic a").each(function() {
         var e = jQuery(this);
         var clone = e.clone();
-        var l = e.parents("div.topic").find("> a:last-child") || e;
+        var l = e.parents("div.topic").find("> a:last-child");
+
+        if(l.length == 0)
+            l = e;
 
         clone.text("Top");
         clone.attr("style", clone.attr("style") +
