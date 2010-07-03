@@ -411,15 +411,17 @@ jQuery(function() {
             "id=\"my-settings-link\" " +
             "title=\"View/edit your forum settings.\">settings</a>");
 
-    // Last-read links.
+    // Last-read and Top links.
     jQuery("#thread-list").find("span.topic a").each(function() {
         var e = jQuery(this);
         var clone = e.clone();
+        var l = e.parents("div.topic").find("> a:last-child") || e;
 
         clone.text("Top");
-        clone.attr("style", clone.attr("style") + "; float: right; margin-right: 1em;");
+        clone.attr("style", clone.attr("style") +
+                "; float: right; margin-right: 1em;");
 
-        e.attr("href", e.attr("href") + "#last_read");
+        e.attr("href", l.attr("href") + "#last_read");
         e.after(clone);
     });
 
