@@ -276,6 +276,28 @@ bam = {
                     "</quote>");
         },
 
+    showConfig:
+        function()
+        {
+            var html = '<div class="acc_js" id="acc_js_config_dialog" style="background-color: lightblue; border: 2px solid black; display: none;"><div><div><label for="acc_js_profile">Profile:</label><select name="acc_js_profile" id="acc_js_profile"><option value="new">New...</option></select></div><div style="display: none;"><label for="acc_js_profile_name">Profile Name:</label><input type="text" name="acc_js_profile_name" id="acc_js_profile_name" /></div></div><hr /><div><input type="checkbox" name="acc_js_addlastReadToBoard" id="acc_js_addlastReadToBoard" /><label for="acc_js_addLastReadToBoard">Make thread topics on the boards go to the last read post (same as double-clicking). Useful for Firefox\'s Vimperator extension, which lets you easily follow links by typing instead of using the mouse or tabbing through them.</label></div><div><input type="checkbox" name="acc_js_addTopToBoard" id="acc_js_addTopToBoard" /><label for="acc_js_addTopToBoard">Add "Top" links the right of thread topics on the message board (allows you to jump straight to the top, even with the last read fixup above)</label></div><div><input type="checkbox" name="acc_js_extendMenu" id="acc_js_extendMenu" /><label for="acc_js_extendMenu">Extend the A.cc menu with shortcuts to the control center, etc.</label></div><div><input type="text" name="acc_js_menuWidth" id="acc_js_menuWidth" /><label for="acc_js_menuWidth"></label></div><div><input type="checkbox" name="acc_js_extendPosts" id="acc_js_extendPosts" /><label for="acc_js_extendPosts">Extend posts on A.cc with "Mockup", "Quote", and "Stub" links.</label></div><div><input type="checkbox" name="acc_js_" id="acc_js_" /><label for="acc_js_"></label></div><div><button id="acc_js_save_config_button">Save</button><button id="acc_js_cancel_config_button">Cancel</button></div></div>';
+            var dialog;
+
+            jQuery(document.body).append(html);
+
+            dialog = jQuery("#acc_js_config_dialog");
+            dialog.dialog();
+
+            jQuery("#acc_js_save_config_button").click(function(E) {
+                var profile = jQuery("#acc_js_profile").val();
+                var profileName = jQuery("#acc_js_profile_name");
+//                var
+            });
+
+            jQuery("#acc_js_cancel_config_button").click(function(E) {
+                dialog.dialog("destroy");
+            });
+        },
+
     showException:
         function(ex)
         {
