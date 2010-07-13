@@ -37,7 +37,16 @@
  */
 jQuery.noConflict();
 
+/*
+ * Add our stylesheets.
+ */
+jQuery("head").append("<link rel=\"stylesheet\" type=\"text/css\" " +
+        "href=\"http://www.castopulence.org/js/acc.css\" />" +
+        "<link rel=\"stylesheet\" type=\"text/css\" " +
+        "href=\"http://castopulence.org/js/jquery-ui.css\" />");
+
 bam = {
+    configHtml: null,
     exceptionDialogCount: 0,
 
     cloneBr:
@@ -182,22 +191,47 @@ bam = {
             });
         },
 
-    htmlDecode:
-        function(s)
+    closeDialog:
+        function(dialog)
         {
-            return s.replace(/&quot;/g, "\"")
-                .replace(/&lt;/g, "<")
-                .replace(/&gt;/g, ">")
-                .replace(/&#39;/g, "'")
-                .replace(/&amp;/g, "&");
+            jQuery(dialog).dialog("destroy");
         },
 
-    htmlEncode:
-        function(s)
+    getConfigDialog:
+        function(loadDialog, callback)
         {
-            return s.replace(/&/g, "&amp;").replace(/'/g, "&#39;")
-                    .replace(/"/g, "&quot;").replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;");
+            var self = this;
+
+            if(this.configHtml)
+            {
+                if(typeof callback == "function")
+                    callback(null, this.configHtml);
+            }
+            else
+            {
+                new Ajax.Request("http://www.castopulence.org/js/config.txt",
+                {
+                    onError:
+                        function() {
+                            bam.closeDialog(loadDialog);
+                            bam.showException(new Error(
+                                    "Failed to load config dialog."));
+                        },
+
+                    onException:
+                        function(req, ex) {
+                            bam.showException(ex);
+                        },
+
+                    onSuccess:
+                        function(transport) {
+                            self.configHtml = transport.responseText;
+
+                            if(typeof callback == "function")
+                                callback(transport);
+                        }
+                });
+            }
         },
 
     getPost:
@@ -259,6 +293,24 @@ bam = {
             return q;
         },
 
+    htmlDecode:
+        function(s)
+        {
+            return s.replace(/&quot;/g, "\"")
+                .replace(/&lt;/g, "<")
+                .replace(/&gt;/g, ">")
+                .replace(/&#39;/g, "'")
+                .replace(/&amp;/g, "&");
+        },
+
+    htmlEncode:
+        function(s)
+        {
+            return s.replace(/&/g, "&amp;").replace(/'/g, "&#39;")
+                    .replace(/"/g, "&quot;").replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+        },
+
     quote:
         function(id)
         {
@@ -276,25 +328,40 @@ bam = {
                     "</quote>");
         },
 
+    saveConfig:
+        function()
+        {
+            var profile = jQuery("#acc_js_profile").val();
+            var profileName = jQuery("#acc_js_profile_name");
+//                  var
+
+            return false;
+        },
+
     showConfig:
         function()
         {
-            var html = '<div class="acc_js" id="acc_js_config_dialog" style="background-color: lightblue; border: 2px solid black; display: none;"><div><div><label for="acc_js_profile">Profile:</label><select name="acc_js_profile" id="acc_js_profile"><option value="new">New...</option></select></div><div style="display: none;"><label for="acc_js_profile_name">Profile Name:</label><input type="text" name="acc_js_profile_name" id="acc_js_profile_name" /></div></div><hr /><div><input type="checkbox" name="acc_js_addlastReadToBoard" id="acc_js_addlastReadToBoard" /><label for="acc_js_addLastReadToBoard">Make thread topics on the boards go to the last read post (same as double-clicking). Useful for Firefox\'s Vimperator extension, which lets you easily follow links by typing instead of using the mouse or tabbing through them.</label></div><div><input type="checkbox" name="acc_js_addTopToBoard" id="acc_js_addTopToBoard" /><label for="acc_js_addTopToBoard">Add "Top" links the right of thread topics on the message board (allows you to jump straight to the top, even with the last read fixup above)</label></div><div><input type="checkbox" name="acc_js_extendMenu" id="acc_js_extendMenu" /><label for="acc_js_extendMenu">Extend the A.cc menu with shortcuts to the control center, etc.</label></div><div><input type="text" name="acc_js_menuWidth" id="acc_js_menuWidth" /><label for="acc_js_menuWidth"></label></div><div><input type="checkbox" name="acc_js_extendPosts" id="acc_js_extendPosts" /><label for="acc_js_extendPosts">Extend posts on A.cc with "Mockup", "Quote", and "Stub" links.</label></div><div><input type="checkbox" name="acc_js_" id="acc_js_" /><label for="acc_js_"></label></div><div><button id="acc_js_save_config_button">Save</button><button id="acc_js_cancel_config_button">Cancel</button></div></div>';
-            var dialog;
+            var loadDialog = bam.showLoading("dialog");
 
-            jQuery(document.body).append(html);
+            bam.getConfigDialog(loadDialog, function(transport, html) {
+                var configDialog;
 
-            dialog = jQuery("#acc_js_config_dialog");
-            dialog.dialog();
+                jQuery(document.body).append(
+                        html || transport.responseText);
 
-            jQuery("#acc_js_save_config_button").click(function(E) {
-                var profile = jQuery("#acc_js_profile").val();
-                var profileName = jQuery("#acc_js_profile_name");
-//                var
-            });
+                configDialog = jQuery(document.body).find(
+                        "#acc_js_config_dialog");
 
-            jQuery("#acc_js_cancel_config_button").click(function(E) {
-                dialog.dialog("destroy");
+                bam.closeDialog(loadDialog);
+
+                jQuery("#acc_js_save_config_button").click(function(E) {
+                    if(bam.saveConfig())
+                        bam.closeDialog(configDialog);
+                });
+
+                jQuery("#acc_js_cancel_config_button").click(function(E) {
+                    bam.closeDialog(configDialog);
+                });
             });
         },
 
@@ -343,6 +410,26 @@ bam = {
             }
 
             e.find(".bam-verbose").fadeIn("slow");
+        },
+
+    showLoading:
+        function(what)
+        {
+            var html = "<div id=\"acc_js_loading_dialog\" " +
+                    "title=\"acc.js - Loading...\">" +
+                    "Loading "
+                    + (what || "something") +
+                    " from server...</div>";
+            var loadDialog;
+            
+            jQuery(document.body).append(html);
+
+            loadDialog = jQuery(document.body).find(
+                    "> div:last-child");
+
+            loadDialog.dialog();
+
+            return loadDialog;
         },
 
     stripReferenceBlock:
@@ -409,7 +496,7 @@ jQuery(function() {
      * smaller screens, this can be a problem. Maybe eventually support
      * can be added for a configuration menu to control this.
      */
-    jQuery("table[summary='forum header'] td:nth-child(2)").width(650);
+    jQuery("table[summary='forum header'] td:nth-child(2)").width(750);
 
     // Navigation menu additions.
     jQuery("#forum-navigation").find("a:nth-child(5)").after(
@@ -431,7 +518,14 @@ jQuery(function() {
             "<a " +
             "href=\"/cc/forums-settings\" " +
             "id=\"my-settings-link\" " +
-            "title=\"View/edit your forum settings.\">settings</a>");
+            "title=\"View/edit your forum settings.\">settings</a> | " +
+            "<a " +
+            "id=\"my-config-link\" " +
+            "title=\"View/edit your acc.js configuration.\">config</a>");
+
+    jQuery("#my-config-link").click(function() {
+        bam.showConfig();
+    });
 
     // Last-read and Top links.
     jQuery("#thread-list").find("span.topic a").each(function() {
