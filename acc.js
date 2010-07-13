@@ -495,6 +495,16 @@ if(typeof jQuery != "undefined")
 
     jQuery(function() {
         /*
+         * Stop the annoying vuvuzela sound (probably only needed
+         * temporarily). ;)
+         */
+        jQuery("#vuvuzela").each(function() {
+            if(typeof this.pause == "function")
+                this.pause();
+            this.currentTime = 0;
+        });
+
+        /*
          * Navigation menu width. Wider to avoid moving content down (it can
          * be annoying when you're trying to click and link and it suddently
          * jolts down as this JS runs in the background). Of course, on
