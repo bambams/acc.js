@@ -389,6 +389,8 @@ jQuery(function() {
      */
     jQuery("table[summary='forum header'] td:nth-child(2)").width(650);
 
+    jQuery(document.body).prepend("<div id=\"bam-top\"></div>");
+
     // Navigation menu additions.
     jQuery("#forum-navigation").find("a:nth-child(5)").after(
             " | <a " +
