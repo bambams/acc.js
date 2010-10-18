@@ -439,9 +439,16 @@ jQuery(function() {
                 "<a href=\"javascript:bam.quote(" +
                 o.id +
                 ");\" title=\"Quote this post.\">Quote</a> " +
+                "<a href=\"/pm/compose/" +
+                o.memberNumber +
+                "\" title=\"Send a private message to " +
+                o.originator +
+                ".\">PM</a> " +
                 "<a href=\"javascript:bam.stub(" +
                 o.id +
-                ");\" title=\"Stub quote this post.\">Stub</a>");
+                ");\" title=\"Stub quote this post.\">Stub</a> " +
+                "<a href=\"#bam-top\" " +
+                "title=\"Jump to the top of the page.\">Top</a>");
     });
 
     // Add title attribute to cusses. ;)
