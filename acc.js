@@ -19,7 +19,7 @@
  * script list:
  *
  * http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js
- * http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js
+ * http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js
  * http://www.castoulence.org/js/acc.min.js
  *
  * As one might expect, it comes with NO WARRANTY, etc. USE AT OWN RISK.
@@ -35,449 +35,560 @@
  *
  * [2] http://code.google.com/apis/ajaxlibs/documentation/
  */
-jQuery.noConflict();
 
-bam = {
-    exceptionDialogCount: 0,
+// It appears that jQuery is currently conflicting with A.cc in some way.
+// So I'll wrap the script so that it doesn't error without jQuery.
+if(typeof jQuery != "undefined")
+{
+    jQuery.noConflict();
 
-    cloneBr:
-        function(e)
-        {
-            e.replaceWith(function() {
-                return "\n";
-            });
-        },
+    /*
+     * Add our stylesheets.
+     */
+    jQuery("head").append("<link rel=\"stylesheet\" type=\"text/css\" " +
+            "href=\"http://www.castopulence.org/js/acc.css\" />" +
+            "<link rel=\"stylesheet\" type=\"text/css\" " +
+            "href=\"http://castopulence.org/js/jquery-ui.css\" />");
 
-    cloneCode:
-        function(e)
-        {
-            e.replaceWith(function() {
-                var e = jQuery(this);
+    bam = {
+        configHtml: null,
+        exceptionDialogCount: 0,
 
-                return "<code>" +
-                        (e.hasClass("snippet") ? "\n" : "") +
-                        e.text().trim() +
-                        (e.hasClass("snippet") ? "\n" : "") +
-                        "</code>";
-            });
-        },
-
-    cloneCuss:
-        function(e)
-        {
-            e.replaceWith(function() {
-                return jQuery(this).text();
-            });
-        },
-
-    cloneParagraph:
-        function(e)
-        {
-            e.replaceWith(function() {
-                return jQuery(this).html() + "\n\n";
-            });
-        },
-
-    clonePost:
-        function(post)
-        {
-            var mockup = post.mockup.clone();
-
-            this.stripUrlDisclaimers(mockup);
-            this.trimWhitespace(mockup);
-
-            mockup.find("br").each(function() {
-                bam.cloneBr(jQuery(this));
-            });
-
-            mockup.find("div.quote_container").each(function() {
-                bam.cloneQuote(jQuery(this));
-            });
-
-            mockup.find(".source-code").each(function() {
-                bam.cloneCode(jQuery(this));
-            });
-
-            mockup.find("div.youtube").each(function() {
-                bam.cloneYouTube(jQuery(this));
-            });
-
-            mockup.find("img").each(function() {
-                var e = jQuery(this);
-
-                if(/^http:\/\/www\.allegro\.cc\/forums\/smileys\//.test(
-                        e.attr("src")))
-                {
-                    bam.cloneSmiley(e);
-                }
-            });
-
-            mockup.find("p").each(function() {
-                bam.cloneParagraph(jQuery(this));
-            });
-
-            mockup.find("span.cuss").each(function() {
-                bam.cloneCuss(jQuery(this));
-            });
-
-            mockup.find("span.ref").each(function() {
-                bam.cloneReference(jQuery(this));
-            });
-
-            this.stripReferenceBlock(mockup);
-            this.stripXhtmlXmlnsAttribute(mockup);
-
-            return mockup.html();
-        },
-
-    cloneQuote:
-        function(e)
-        {
-            e.replaceWith(function() {
-                var fmt = "<quote{name}{src}>{body}</quote>\n";
-                var quote = bam.getQuote(jQuery(this));
-
-                return fmt
-                        .replace("{name}", quote.name ?
-                        " name=\"" + bam.htmlEncode(quote.name) +
-                        "\"" : "").replace("{src}", quote.src ?
-                        " src=\"" + bam.htmlEncode(quote.src) +
-                        "\"" : "").replace("{body}", quote.body);
-            });
-        },
-
-    cloneReference:
-        function(e)
-        {
-            e.replaceWith(function() {
-                var e = jQuery(this);
-                var i = e.find("a").text() | 0;
-                var ref = e.parents(".mockup").find(
-                        ".ref-block li:nth-child(" + i + ")");
-
-                //bam.stripUrlDisclaimers(ref);
-
-                return "<ref>" + ref.html() + "</ref>";
-            });
-        },
-
-    cloneSmiley:
-        function(e)
-        {
-            e.replaceWith(function() {
-                return jQuery(this).attr("alt");
-            });
-        },
-
-    cloneYouTube:
-        function(e)
-        {
-            //e.replaceWith(function() {
-                //return "<object data=\"" +
-                        //jQuery(this).find("a").attr("href") +
-                        //"\"></object>";
-            //});
-            e.replaceWith(function() {
-                return "\\[" + jQuery(this).find("a").attr("href") + "]";
-            });
-        },
-
-    htmlDecode:
-        function(s)
-        {
-            return s.replace(/&quot;/g, "\"")
-                .replace(/&lt;/g, "<")
-                .replace(/&gt;/g, ">")
-                .replace(/&#39;/g, "'")
-                .replace(/&amp;/g, "&");
-        },
-
-    htmlEncode:
-        function(s)
-        {
-            return s.replace(/&/g, "&amp;").replace(/'/g, "&#39;")
-                    .replace(/"/g, "&quot;").replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;");
-        },
-
-    getPost:
-        function(e)
-        {
-            var p;
-
-            if(e instanceof Number)
-                e = jQuery("#post-" + id);
-            else if(!(e instanceof jQuery))
-                e = jQuery(e);
-
-            p = {
-                originator: e.find(".originator").text(),
-                memberNumber: e.find(".member-number").text().replace(
-                        "Member #", "") | 0,
-                header: e.find(".header"),
-                id: e.get(0).id.replace("post-", "") | 0,
-                mockup: e.find("td.content > div > .mockup"),
-                post: e,
-                src: e.find(".posted-on > a").get(0).href
-            };
-
-            if(e.length != 1 || p.header.length != 1 ||
-                    p.mockup.length != 1)
+        cloneBr:
+            function(e)
             {
-                throw new Error("Invalid argument 'e'. Must be a " +
-                        "Number (the post id) or a jQuery object with " +
-                        "just the post element selected.");
-            }
+                e.replaceWith(function() {
+                    return "\n";
+                });
+            },
 
-            return p;
-        },
+        cloneCode:
+            function(e)
+            {
+                e.replaceWith(function() {
+                    var e = jQuery(this);
 
-    getQuote:
-        function(e)
-        {
-            var name;
-            var p;
-            var q;
-            var src;
+                    return "<code>" +
+                            (e.hasClass("snippet") ? "\n" : "") +
+                            e.text().trim() +
+                            (e.hasClass("snippet") ? "\n" : "") +
+                            "</code>";
+                });
+            },
 
-            if(!(e instanceof jQuery))
-                e = jQuery(e);
+        cloneCuss:
+            function(e)
+            {
+                e.replaceWith(function() {
+                    return jQuery(this).text();
+                });
+            },
 
-            name = (name = (name = e.find(".title")) && name.text()) &&
-                    name.replace(/ said:$/, "");
-            src = e.find(".title > a").attr("href");
+        cloneParagraph:
+            function(e)
+            {
+                e.replaceWith(function() {
+                    return jQuery(this).html() + "\n\n";
+                });
+            },
 
-            if(/^#post-(\d+)/.test(src))
-                src = jQuery(src + " .posted-on a").attr("href");
+        clonePost:
+            function(post)
+            {
+                var mockup = post.mockup.clone();
 
-            q = {
-                body: e.find(".quote").text().trim(),
-                name: name && name.trim() || "",
-                src: src && src.trim() || ""
-            };
+                this.stripUrlDisclaimers(mockup);
+                this.trimWhitespace(mockup);
 
-            return q;
-        },
+                mockup.find("br").each(function() {
+                    bam.cloneBr(jQuery(this));
+                });
 
-    quote:
-        function(id)
-        {
-            var post = this.getPost(jQuery("#post-" + id));
-            var body = jQuery("#mub-body");
-            var quote = this.clonePost(post).trim();
+                mockup.find("div.quote_container").each(function() {
+                    bam.cloneQuote(jQuery(this));
+                });
 
-            body.val(body.val() +
-                    (body.val().length != 0 ? "\n" : "") +
-                    "<quote name=\"" + post.originator +
-                    "\" src=\"" + post.src + "\">\n" +
-                    quote +
-                    (quote[quote.length - 1] != "\n" ?
-                    "\n" : "") +
-                    "</quote>");
-        },
+                mockup.find(".source-code").each(function() {
+                    bam.cloneCode(jQuery(this));
+                });
 
-    showConfig:
-        function()
-        {
-            var html = '<div class="acc_js" id="acc_js_config_dialog" style="background-color: lightblue; border: 2px solid black; display: none;"><div><div><label for="acc_js_profile">Profile:</label><select name="acc_js_profile" id="acc_js_profile"><option value="new">New...</option></select></div><div style="display: none;"><label for="acc_js_profile_name">Profile Name:</label><input type="text" name="acc_js_profile_name" id="acc_js_profile_name" /></div></div><hr /><div><input type="checkbox" name="acc_js_addlastReadToBoard" id="acc_js_addlastReadToBoard" /><label for="acc_js_addLastReadToBoard">Make thread topics on the boards go to the last read post (same as double-clicking). Useful for Firefox\'s Vimperator extension, which lets you easily follow links by typing instead of using the mouse or tabbing through them.</label></div><div><input type="checkbox" name="acc_js_addTopToBoard" id="acc_js_addTopToBoard" /><label for="acc_js_addTopToBoard">Add "Top" links the right of thread topics on the message board (allows you to jump straight to the top, even with the last read fixup above)</label></div><div><input type="checkbox" name="acc_js_extendMenu" id="acc_js_extendMenu" /><label for="acc_js_extendMenu">Extend the A.cc menu with shortcuts to the control center, etc.</label></div><div><input type="text" name="acc_js_menuWidth" id="acc_js_menuWidth" /><label for="acc_js_menuWidth"></label></div><div><input type="checkbox" name="acc_js_extendPosts" id="acc_js_extendPosts" /><label for="acc_js_extendPosts">Extend posts on A.cc with "Mockup", "Quote", and "Stub" links.</label></div><div><input type="checkbox" name="acc_js_" id="acc_js_" /><label for="acc_js_"></label></div><div><button id="acc_js_save_config_button">Save</button><button id="acc_js_cancel_config_button">Cancel</button></div></div>';
-            var dialog;
+                mockup.find("div.youtube").each(function() {
+                    bam.cloneYouTube(jQuery(this));
+                });
 
-            jQuery(document.body).append(html);
+                mockup.find("img").each(function() {
+                    var e = jQuery(this);
 
-            dialog = jQuery("#acc_js_config_dialog");
-            dialog.dialog();
+                    if(/^http:\/\/www\.allegro\.cc\/forums\/smileys\//.test(
+                            e.attr("src")))
+                    {
+                        bam.cloneSmiley(e);
+                    }
+                });
 
-            jQuery("#acc_js_save_config_button").click(function(E) {
+                mockup.find("p").each(function() {
+                    bam.cloneParagraph(jQuery(this));
+                });
+
+                mockup.find("span.cuss").each(function() {
+                    bam.cloneCuss(jQuery(this));
+                });
+
+                mockup.find("span.ref").each(function() {
+                    bam.cloneReference(jQuery(this));
+                });
+
+                this.stripReferenceBlock(mockup);
+                this.stripXhtmlXmlnsAttribute(mockup);
+
+                return mockup.html();
+            },
+
+        cloneQuote:
+            function(e)
+            {
+                e.replaceWith(function() {
+                    var fmt = "<quote{name}{src}>{body}</quote>\n";
+                    var quote = bam.getQuote(jQuery(this));
+
+                    return fmt
+                            .replace("{name}", quote.name ?
+                            " name=\"" + bam.htmlEncode(quote.name) +
+                            "\"" : "").replace("{src}", quote.src ?
+                            " src=\"" + bam.htmlEncode(quote.src) +
+                            "\"" : "").replace("{body}", quote.body);
+                });
+            },
+
+        cloneReference:
+            function(e)
+            {
+                e.replaceWith(function() {
+                    var e = jQuery(this);
+                    var i = e.find("a").text() | 0;
+                    var ref = e.parents(".mockup").find(
+                            ".ref-block li:nth-child(" + i + ")");
+
+                    //bam.stripUrlDisclaimers(ref);
+
+                    return "<ref>" + ref.html() + "</ref>";
+                });
+            },
+
+        cloneSmiley:
+            function(e)
+            {
+                e.replaceWith(function() {
+                    return jQuery(this).attr("alt");
+                });
+            },
+
+        cloneYouTube:
+            function(e)
+            {
+                //e.replaceWith(function() {
+                    //return "<object data=\"" +
+                            //jQuery(this).find("a").attr("href") +
+                            //"\"></object>";
+                //});
+                e.replaceWith(function() {
+                    return "\\[" + jQuery(this).find("a").attr("href") + "]";
+                });
+            },
+
+        closeDialog:
+            function(dialog)
+            {
+                jQuery(dialog).dialog("destroy");
+            },
+
+        getConfigDialog:
+            function(loadDialog, callback)
+            {
+                var self = this;
+
+                if(this.configHtml)
+                {
+                    if(typeof callback == "function")
+                        callback(null, this.configHtml);
+                }
+                else
+                {
+                    new Ajax.Request("http://www.castopulence.org/js/config.txt",
+                    {
+                        onError:
+                            function() {
+                                bam.closeDialog(loadDialog);
+                                bam.showException(new Error(
+                                        "Failed to load config dialog."));
+                            },
+
+                        onException:
+                            function(req, ex) {
+                                bam.showException(ex);
+                            },
+
+                        onSuccess:
+                            function(transport) {
+                                self.configHtml = transport.responseText;
+
+                                if(typeof callback == "function")
+                                    callback(transport);
+                            }
+                    });
+                }
+            },
+
+        getPost:
+            function(e)
+            {
+                var p;
+
+                if(e instanceof Number)
+                    e = jQuery("#post-" + id);
+                else if(!(e instanceof jQuery))
+                    e = jQuery(e);
+
+                p = {
+                    originator: e.find(".originator").text(),
+                    memberNumber: e.find(".member-number").text().replace(
+                            "Member #", "") | 0,
+                    header: e.find(".header"),
+                    id: e.get(0).id.replace("post-", "") | 0,
+                    mockup: e.find("td.content > div > .mockup"),
+                    post: e,
+                    src: e.find(".posted-on > a").get(0).href
+                };
+
+                if(e.length != 1 || p.header.length != 1 ||
+                        p.mockup.length != 1)
+                {
+                    throw new Error("Invalid argument 'e'. Must be a " +
+                            "Number (the post id) or a jQuery object with " +
+                            "just the post element selected.");
+                }
+
+                return p;
+            },
+
+        getQuote:
+            function(e)
+            {
+                var name;
+                var p;
+                var q;
+                var src;
+
+                if(!(e instanceof jQuery))
+                    e = jQuery(e);
+
+                name = (name = (name = e.find(".title")) && name.text()) &&
+                        name.replace(/ said:$/, "");
+                src = e.find(".title > a").attr("href");
+
+                if(/^#post-(\d+)/.test(src))
+                    src = jQuery(src + " .posted-on a").attr("href");
+
+                q = {
+                    body: e.find(".quote").text().trim(),
+                    name: name && name.trim() || "",
+                    src: src && src.trim() || ""
+                };
+
+                return q;
+            },
+
+
+        htmlDecode:
+            function(s)
+            {
+                return s.replace(/&quot;/g, "\"")
+                    .replace(/&lt;/g, "<")
+                    .replace(/&gt;/g, ">")
+                    .replace(/&#39;/g, "'")
+                    .replace(/&amp;/g, "&");
+            },
+
+        htmlEncode:
+            function(s)
+            {
+                return s.replace(/&/g, "&amp;").replace(/'/g, "&#39;")
+                        .replace(/"/g, "&quot;").replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;");
+            },
+
+        quote:
+            function(id)
+            {
+                var post = this.getPost(jQuery("#post-" + id));
+                var body = jQuery("#mub-body");
+                var quote = this.clonePost(post).trim();
+
+                body.val(body.val() +
+                        (body.val().length != 0 ? "\n" : "") +
+                        "<quote name=\"" + post.originator +
+                        "\" src=\"" + post.src + "\">\n" +
+                        quote +
+                        (quote[quote.length - 1] != "\n" ?
+                        "\n" : "") +
+                        "</quote>");
+            },
+
+        saveConfig:
+            function()
+            {
                 var profile = jQuery("#acc_js_profile").val();
                 var profileName = jQuery("#acc_js_profile_name");
-//                var
-            });
+//              var
 
-            jQuery("#acc_js_cancel_config_button").click(function(E) {
-                dialog.dialog("destroy");
-            });
-        },
+                return false;
+            },
 
-    showException:
-        function(ex)
-        {
-            var e = jQuery(document.body).append(
-                    "<div class=\".bam-exception-dialog\" " +
-                    "title=\"Unhandled Exception Caught\">" +
-                    "<p>The following exception was thrown and not " +
-                    "handled:</p><p>" +
-                    ex.message +
-                    "</p>" + (jQuery.isFunction(ex.toSource) ?
-                    "<a href=\"javascript:bam.showExceptionVerbose(" +
-                    this.exceptionDialogCount +
-                    ");\">Show complete exception.</a><p " +
-                    "class=\".bam-verbose\">" +
-                    ex.toSource() +
-                    "</p>" : "") +
-                    "</div>");
-
-            e.get(0).id = "bam-exception-dialog|" +
-                    this.exceptionDialogCount;
-            e.find(".bam-verbose").hide();
-
-            e.dialog({
-                close:
-                    function() {
-                        jQuery(this).remove();
-                    }
-            });
-
-            this.exceptionDialogCount++;
-        },
-
-    showExeptionVerbose:
-        function(id)
-        {
-            var e = jQuery("#bam-exception-dialog|" + id);
-
-            if(e.length != 1)
+        showConfig:
+            function()
             {
-                throw new Error("Failed to find exception dialog '" +
-                        id +
-                        "'.");
-            }
+                var loadDialog = bam.showLoading("dialog");
 
-            e.find(".bam-verbose").fadeIn("slow");
-        },
+                bam.getConfigDialog(loadDialog, function(transport, html) {
+                    var configDialog;
 
-    stripReferenceBlock:
-        function(e)
-        {
+                    jQuery(document.body).append(
+                            html || transport.responseText);
+
+                    configDialog = jQuery(document.body).find(
+                            "#acc_js_config_dialog");
+
+                    bam.closeDialog(loadDialog);
+
+                    jQuery("#acc_js_save_config_button").click(function(E) {
+                        if(bam.saveConfig())
+                            bam.closeDialog(configDialog);
+                    });
+
+                    jQuery("#acc_js_cancel_config_button").click(function(E) {
+                        bam.closeDialog(configDialog);
+                    });
+                });
+            },
+
+        showException:
+            function(ex)
+            {
+                var e = jQuery(document.body).append(
+                        "<div class=\".bam-exception-dialog\" " +
+                        "title=\"Unhandled Exception Caught\">" +
+                        "<p>The following exception was thrown and not " +
+                        "handled:</p><p>" +
+                        ex.message +
+                        "</p>" + (jQuery.isFunction(ex.toSource) ?
+                        "<a href=\"javascript:bam.showExceptionVerbose(" +
+                        this.exceptionDialogCount +
+                        ");\">Show complete exception.</a><p " +
+                        "class=\".bam-verbose\">" +
+                        ex.toSource() +
+                        "</p>" : "") +
+                        "</div>");
+
+                e.get(0).id = "bam-exception-dialog|" +
+                        this.exceptionDialogCount;
+                e.find(".bam-verbose").hide();
+
+                e.dialog({
+                    close:
+                        function() {
+                            jQuery(this).remove();
+                        }
+                });
+
+                this.exceptionDialogCount++;
+            },
+
+        showExeptionVerbose:
+            function(id)
+            {
+                var e = jQuery("#bam-exception-dialog|" + id);
+
+                if(e.length != 1)
+                {
+                    throw new Error("Failed to find exception dialog '" +
+                            id +
+                            "'.");
+                }
+
+                e.find(".bam-verbose").fadeIn("slow");
+            },
+
+        showLoading:
+            function(what)
+            {
+                var html = "<div id=\"acc_js_loading_dialog\" " +
+                        "title=\"acc.js - Loading...\">" +
+                        "Loading "
+                        + (what || "something") +
+                        " from server...</div>";
+                var loadDialog;
+                
+                jQuery(document.body).append(html);
+
+                loadDialog = jQuery(document.body).find(
+                        "> div:last-child");
+
+                loadDialog.dialog();
+
+                return loadDialog;
+            },
+
+        stripReferenceBlock:
+            function(e)
+            {
             e.find(".ref-block").remove();
         },
 
-    stripUrlDisclaimers:
-        function(e)
-        {
-            /*
-             * Remove those "[domain]" warnings that are automatically
-             * added after hyperlinks on the backend.
-             */
-            e.find("span.url").remove();
-        },
+        stripUrlDisclaimers:
+            function(e)
+            {
+                /*
+                 * Remove those "[domain]" warnings that are automatically
+                 * added after hyperlinks on the backend.
+                 */
+                e.find("span.url").remove();
+            },
 
-    stripXhtmlXmlnsAttribute:
-        function(e)
-        {
-            e.find("*[xmlns='http://www.w3.org/1999/xhtml']").removeAttr(
-                    "xmlns");
-        },
+        stripXhtmlXmlnsAttribute:
+            function(e)
+            {
+                e.find("*[xmlns='http://www.w3.org/1999/xhtml']").removeAttr(
+                        "xmlns");
+            },
 
-    /*
-     * It's very hard to get the quoting perfect so as an alternative,
-     * this method just appends correct <quote> tags, with name and src,
-     * without actually adding any quoted content. This leaves the
-     * quoting up to you, but saves you the trouble of scrolling back and
-     * forth on the page to copy the username/hyperlink.
-     */
-    stub:
-        function(id)
-        {
-            var post = this.getPost(jQuery("#post-" + id));
-            var body = jQuery("#mub-body");
+        /*
+         * It's very hard to get the quoting perfect so as an alternative,
+         * this method just appends correct <quote> tags, with name and src,
+         * without actually adding any quoted content. This leaves the
+         * quoting up to you, but saves you the trouble of scrolling back and
+         * forth on the page to copy the username/hyperlink.
+         */
+        stub:
+            function(id)
+            {
+                var post = this.getPost(jQuery("#post-" + id));
+                var body = jQuery("#mub-body");
 
-            body.val(body.val() +
-                    (body.val().length != 0 ? "\n" : "") +
-                    "<quote name=\"" + post.originator +
-                    "\" src=\"" + post.src + "\">\n" +
-                    "\n" +
-                    "</quote>");
-        },
+                body.val(body.val() +
+                        (body.val().length != 0 ? "\n" : "") +
+                        "<quote name=\"" + post.originator +
+                        "\" src=\"" + post.src + "\">\n" +
+                        "\n" +
+                        "</quote>");
+            },
 
-    trimWhitespace:
-        function(e)
-        {
-            e.contents().filter(function() {
-                var e = jQuery(this);
+        trimWhitespace:
+            function(e)
+            {
+                e.contents().filter(function() {
+                    var e = jQuery(this);
 
-                if(this.nodeType == (Node && Node.TEXT_NODE || 3))
-                    e.val(e.val().trim());
-            });
-        }
+                    if(this.nodeType == (Node && Node.TEXT_NODE || 3))
+                        e.val(e.val().trim());
+                });
+            }
+    }
+
+    jQuery(function() {
+        /*
+         * Stop the annoying vuvuzela sound (probably only needed
+         * temporarily). ;)
+         */
+        jQuery("#vuvuzela").each(function() {
+            if(typeof this.pause == "function")
+                this.pause();
+            this.currentTime = 0;
+        });
+
+        /*
+         * Navigation menu width. Wider to avoid moving content down (it can
+         * be annoying when you're trying to click and link and it suddently
+         * jolts down as this JS runs in the background). Of course, on
+         * smaller screens, this can be a problem. Maybe eventually support
+         * can be added for a configuration menu to control this.
+         */
+        jQuery("table[summary='forum header'] td:nth-child(2)").width(750);
+
+        jQuery(document.body).prepend("<div id=\"bam-top\"></div>");
+
+        // Navigation menu additions.
+        jQuery("#forum-navigation").find("a:nth-child(5)").after(
+                " | <a " +
+                "href=\"/cc/theme-css\" " +
+                "title=\"View/edit my custom CSS/JS.\">css/js</a> | " +
+                "<a " +
+                "href=\"https://www.allegro.cc/pm\" " +
+                "id=\"my-inbox-link\" " +
+                "title=\"Your private message inbox.\">inbox</a> | " +
+                "<a " +
+                "href=\"https://www.allegro.cc/pm/list/outbox\" " +
+                "id=\"my-outbox-link\" " +
+                "title=\"Your private message outbox.\">outbox</a> | " +
+                "<a " +
+                "href=\"http://www.allegro.cc/pm/compose/\" " +
+                "id=\"my-compose-link\" " +
+                "title=\"Compose a new private message.\">compose</a> | " +
+                "<a " +
+                "href=\"/cc/forums-settings\" " +
+                "id=\"my-settings-link\" " +
+                "title=\"View/edit your forum settings.\">settings</a> | " +
+                "<a " +
+                "id=\"my-config-link\" " +
+                "title=\"View/edit your acc.js configuration.\">config</a>");
+
+        jQuery("#my-config-link").click(function() {
+            bam.showConfig();
+        });
+
+        // Last-read and Top links.
+        jQuery("#thread-list").find("span.topic a").each(function() {
+            var e = jQuery(this);
+            var clone = e.clone();
+            var l = e.parents("div.topic").find("> a:last-child");
+
+            if(l.length == 0)
+                l = e;
+
+            clone.text("Top");
+            clone.attr("style", clone.attr("style") +
+                    "; float: right; margin-right: 1em;");
+
+            e.attr("href", l.attr("href") + "#last_read");
+            e.after(clone);
+        });
+
+        // Post header additions.
+        jQuery("#thread .post").each(function(E) {
+            var o = bam.getPost(jQuery(this));
+
+            o.header.append("<a href=\"#post_form\" " +
+                    "title=\"Jump to the mockup box.\">Mockup</a> " +
+                    "<a href=\"javascript:bam.quote(" +
+                    o.id +
+                    ");\" title=\"Quote this post.\">Quote</a> " +
+                    "<a href=\"/pm/compose/" +
+                    o.memberNumber +
+                    "\" title=\"Send a private message to " +
+                    o.originator +
+                    ".\">PM</a> " +
+                    "<a href=\"javascript:bam.stub(" +
+                    o.id +
+                    ");\" title=\"Stub quote this post.\">Stub</a> " +
+                    "<a href=\"#bam-top\" " +
+                    "title=\"Jump to the top of the page.\">Top</a>");
+        });
+
+        // Add title attribute to cusses. ;)
+        jQuery("span.cuss").each(function() {
+            var e = jQuery(this);
+
+            e.attr("title", e.text());
+        });
+    });
 }
-
-jQuery(function() {
-    /*
-     * Navigation menu width. Wider to avoid moving content down (it can
-     * be annoying when you're trying to click and link and it suddently
-     * jolts down as this JS runs in the background). Of course, on
-     * smaller screens, this can be a problem. Maybe eventually support
-     * can be added for a configuration menu to control this.
-     */
-    jQuery("table[summary='forum header'] td:nth-child(2)").width(650);
-
-    jQuery(document.body).prepend("<div id=\"bam-top\"></div>");
-
-    // Navigation menu additions.
-    jQuery("#forum-navigation").find("a:nth-child(5)").after(
-            " | <a " +
-            "href=\"/cc/theme-css\" " +
-            "title=\"View/edit my custom CSS/JS.\">css/js</a> | " +
-            "<a " +
-            "href=\"https://www.allegro.cc/pm\" " +
-            "id=\"my-inbox-link\" " +
-            "title=\"Your private message inbox.\">inbox</a> | " +
-            "<a " +
-            "href=\"https://www.allegro.cc/pm/list/outbox\" " +
-            "id=\"my-outbox-link\" " +
-            "title=\"Your private message outbox.\">outbox</a> | " +
-            "<a " +
-            "href=\"http://www.allegro.cc/pm/compose/\" " +
-            "id=\"my-compose-link\" " +
-            "title=\"Compose a new private message.\">compose</a> | " +
-            "<a " +
-            "href=\"/cc/forums-settings\" " +
-            "id=\"my-settings-link\" " +
-            "title=\"View/edit your forum settings.\">settings</a>");
-
-    // Last-read and Top links.
-    jQuery("#thread-list").find("span.topic a").each(function() {
-        var e = jQuery(this);
-        var clone = e.clone();
-        var l = e.parents("div.topic").find("> a:last-child");
-
-        if(l.length == 0)
-            l = e;
-
-        clone.text("Top");
-        clone.attr("style", clone.attr("style") +
-                "; float: right; margin-right: 1em;");
-
-        e.attr("href", l.attr("href") + "#last_read");
-        e.after(clone);
-    });
-
-    // Post header additions.
-    jQuery("#thread .post").each(function(E) {
-        var o = bam.getPost(jQuery(this));
-
-        o.header.append("<a href=\"#post_form\" " +
-                "title=\"Jump to the mockup box.\">Mockup</a> " +
-                "<a href=\"javascript:bam.quote(" +
-                o.id +
-                ");\" title=\"Quote this post.\">Quote</a> " +
-                "<a href=\"/pm/compose/" +
-                o.memberNumber +
-                "\" title=\"Send a private message to " +
-                o.originator +
-                ".\">PM</a> " +
-                "<a href=\"javascript:bam.stub(" +
-                o.id +
-                ");\" title=\"Stub quote this post.\">Stub</a> " +
-                "<a href=\"#bam-top\" " +
-                "title=\"Jump to the top of the page.\">Top</a>");
-    });
-
-    // Add title attribute to cusses. ;)
-    jQuery("span.cuss").each(function() {
-        var e = jQuery(this);
-
-        e.attr("title", e.text());
-    });
-});
 
