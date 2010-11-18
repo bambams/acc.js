@@ -252,7 +252,7 @@ if(typeof jQuery != "undefined")
                 p = {
                     originator: e.find(".originator").text(),
                     memberNumber: e.find(".member-number").text().replace(
-                            "Member #", "") | 0,
+                            "Member #", "").replace(",", "") | 0,
                     header: e.find(".header"),
                     id: e.get(0).id.replace("post-", "") | 0,
                     mockup: e.find("td.content > div > .mockup"),
