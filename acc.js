@@ -245,7 +245,7 @@ if(typeof jQuery != "undefined")
                 var p;
 
                 if(e instanceof Number)
-                    e = jQuery("#post-" + id);
+                    e = jQuery("#post-" + e);
                 else if(!(e instanceof jQuery))
                     e = jQuery(e);
 
