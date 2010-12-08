@@ -630,7 +630,11 @@ if(typeof jQuery != "undefined")
                     o.id +
                     ");\" title=\"Stub quote this post.\">Stub</a> " +
                     "<a href=\"#bam-top\" " +
-                    "title=\"Jump to the top of the page.\">Top</a>");
+                    "title=\"Jump to the top of the page.\">Top</a> " +
+                    "<a href=\"javascript:bam.downloadPostCodeZip(" +
+                    o.id +
+                    ");\" title=\"Download a zip file with all named " +
+                    "code tags as files.\">Zip</a>");
         });
 
         // Add title attribute to cusses. ;)
