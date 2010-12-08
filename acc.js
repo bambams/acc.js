@@ -203,7 +203,7 @@ if(typeof jQuery != "undefined")
             },
 
         downloadPostCodeZip:
-            function(e)
+            function(id)
             {
                 var p;
 
@@ -213,11 +213,7 @@ if(typeof jQuery != "undefined")
                             "download <code> blocks as a zip file.");
                 }
 
-                if(e instanceof Number)
-                    e = jQuery("#post-" + e);
-                else if(!(e instanceof jQuery))
-                    e = jQuery(e);
-
+                var e = jQuery("#post-" + id);
                 var scs = e.find("div.source-code:has(" +
                         "div.toolbar > span.name)");
 
