@@ -202,6 +202,60 @@ if(typeof jQuery != "undefined")
                 jQuery(dialog).dialog("destroy");
             },
 
+        downloadPostCodeZip:
+            function(e)
+            {
+                var p;
+
+                if(!JSZip)
+                {
+                    throw new Error("You need to have JSZip loaded to " +
+                            "download <code> blocks as a zip file.");
+                }
+
+                if(e instanceof Number)
+                    e = jQuery("#post-" + e);
+                else if(!(e instanceof jQuery))
+                    e = jQuery(e);
+
+                var scs = e.find("div.source-code:has(" +
+                        "div.toolbar > span.name)");
+
+                if(scs.length < 1)
+                {
+                    throw new Error("There are no code blocks to " +
+                            "download.");
+                }
+
+                var zip = new JSZip();
+
+                for(var i=0; i<scs.length; i++)
+                {
+                    var sc = jQuery(scs.get(i)); 
+                    var path = sc.find("div.toolbar > span.name").text();
+                    var block = sc.find("div.inner").clone();
+                    
+                    block.find("span.number").remove();
+
+                    var code = block.text();
+                    var dirs = path.split(/[\\\/]/);
+                    var folder = zip;
+                    var name = dirs[dirs.length - 1] || path;
+
+                    dirs.length = dirs.length - 1;
+
+                    for(var j=0; j<dirs.length; j++)
+                        folder = folder.folder(dirs[j]);
+
+                    folder.add(name, code);
+                }
+
+                var content = zip.generate();
+
+                window.location.href = "data:application/zip;base64," +
+                        content;
+            },
+
         getConfigDialog:
             function(loadDialog, callback)
             {
