@@ -638,7 +638,7 @@ if(typeof jQuery != "undefined")
                     "<a href=\"javascript:bam.downloadCodeZip(" +
                     o.id +
                     ");\" title=\"Download a zip file with all named " +
-                    "code tags as files.\">Zip</a>");
+                    "code tags as its contents.\">Zip</a>");
         });
 
         // Add title attribute to cusses. ;)
