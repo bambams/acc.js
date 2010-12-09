@@ -202,8 +202,8 @@ if(typeof jQuery != "undefined")
                 jQuery(dialog).dialog("destroy");
             },
 
-        downloadPostCodeZip:
-            function(id)
+        downloadCodeZip:
+            function(e)
             {
                 var p;
 
@@ -213,7 +213,11 @@ if(typeof jQuery != "undefined")
                             "download <code> blocks as a zip file.");
                 }
 
-                var e = jQuery("#post-" + id);
+                if(typeof e == "number" || e instanceof Number)
+                    e = jQuery("#post-" + e);
+                else
+                    e = jQuery(e);
+
                 var scs = e.find("div.source-code:has(" +
                         "div.toolbar > span.name)");
 
@@ -631,7 +635,7 @@ if(typeof jQuery != "undefined")
                     ");\" title=\"Stub quote this post.\">Stub</a> " +
                     "<a href=\"#bam-top\" " +
                     "title=\"Jump to the top of the page.\">Top</a> " +
-                    "<a href=\"javascript:bam.downloadPostCodeZip(" +
+                    "<a href=\"javascript:bam.downloadCodeZip(" +
                     o.id +
                     ");\" title=\"Download a zip file with all named " +
                     "code tags as files.\">Zip</a>");
