@@ -647,6 +647,14 @@ if(typeof jQuery != "undefined")
 
             e.attr("title", e.text());
         });
+
+        // Wrap terminal at 80 characters.
+        jQuery("pre.terminal").each(function() {
+            var e = jQuery(this);
+
+            e.css("width", "80em !important")
+                    .css("white-space", "pre-wrap !important");
+        });
     });
 }
 
