@@ -537,7 +537,9 @@ if(typeof jQuery != "undefined")
 
                 e.css("display", "");
 
-                jQuery(".ignored." + e).remove();
+                var post = this.getPost(e);
+
+                jQuery(".ignored." + post.id).remove();
             },
 
         stripReferenceBlock:
