@@ -14,12 +14,18 @@ to the list of external JavaScript scripts before this script. A
 convenient way is by using the Google API servers, which Google
 encourages you to do anyway[2].
 
+It also [optionally] depends on jszip, which is used to turn named <code>
+blocks into a zip file with the file contents. You only need jszip if you
+intend to use this (not too many people name their <code> tags anyway, but
+I do :P).
+
 For example, add the following lines to your external JavaScript
 script list:
 
 http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js
 http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js
-http://www.castoulence.org/js/acc.min.js
+http://www.castopulence.org/js/jszip.js
+http://www.castopulence.org/js/acc.min.js
 
 As one might expect, it comes with NO WARRANTY, etc. USE AT OWN RISK.
 Also note that it may periodically break as I develop live so you
