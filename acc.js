@@ -298,10 +298,7 @@ if(typeof jQuery != "undefined")
             {
                 var p;
 
-                if(e instanceof Number)
-                    e = jQuery("#post-" + e);
-                else if(!(e instanceof jQuery))
-                    e = jQuery(e);
+                e = this.getPostElement(e);
 
                 p = {
                     originator: e.find(".originator").text(),
@@ -323,6 +320,22 @@ if(typeof jQuery != "undefined")
                 }
 
                 return p;
+            },
+
+        getPostElement:
+            function(e)
+            {
+                if(typeof e == "object" && e instanceof Number ||
+                        typeof e == "number")
+                {
+                    e = jQuery("#post-" + e);
+                }
+                else
+                {
+                    e = jQuery(e);
+                }
+
+                return e;
             },
 
         getQuote:
