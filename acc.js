@@ -384,6 +384,29 @@ if(typeof jQuery != "undefined")
                         .replace(/>/g, "&gt;");
             },
 
+        ignoreMember:
+            function(id)
+            {
+                jQuery(function() {
+                    jQuery(".post.m" + id)
+                            .css("display", "none")
+                            .each(function() {
+                                var e = jQuery(this);
+                                var post = bam.getPost(e);
+
+                                e.after("<div class=\"ignored " +
+                                        post.id +
+                                        "\" style=\"" +
+                                        "text-align: center;\">\n" +
+                                        "This member is ignored. " +
+                                        "(<a href=\"javascript:" +
+                                        "bam.showPost(" +
+                                        post.id +
+                                        ");\">Show post.</a>)</div>");
+                            });
+                });
+            },
+
         quote:
             function(id)
             {
@@ -503,6 +526,16 @@ if(typeof jQuery != "undefined")
                 loadDialog.dialog();
 
                 return loadDialog;
+            },
+
+        showPost:
+            function(e)
+            {
+                e = this.getPostElement(e);
+
+                e.css("display", "");
+
+                jQuery(".ignored." + e).remove();
             },
 
         stripReferenceBlock:
