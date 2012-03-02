@@ -398,7 +398,8 @@ if(typeof jQuery != "undefined")
                                         post.id +
                                         "\" style=\"" +
                                         "text-align: center;\">\n" +
-                                        "This member is ignored. " +
+                                        post.originator +
+                                        " is ignored. " +
                                         "(<a href=\"javascript:" +
                                         "bam.showPost(" +
                                         post.id +
