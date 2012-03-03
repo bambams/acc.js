@@ -205,8 +205,6 @@ if(typeof jQuery != "undefined")
         downloadCodeZip:
             function(e)
             {
-                var p;
-
                 if(!JSZip)
                 {
                     throw new Error("You need to have JSZip loaded to " +
@@ -296,11 +294,9 @@ if(typeof jQuery != "undefined")
         getPost:
             function(e)
             {
-                var p;
-
                 e = this.getPostElement(e);
 
-                p = {
+                var p = {
                     originator: e.find(".originator").text(),
                     memberNumber: e.find(".member-number").text().replace(
                             "Member #", "").replace(",", "") | 0,
@@ -342,7 +338,6 @@ if(typeof jQuery != "undefined")
             function(e)
             {
                 var name;
-                var p;
                 var q;
                 var src;
 
