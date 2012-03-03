@@ -392,7 +392,7 @@ if(typeof jQuery != "undefined")
                                 e.after("<div class=\"ignored " +
                                         post.id +
                                         "\" style=\"" +
-                                        "background-color: #ddaa11;" +
+                                        "background-color: #e1c896;" +
                                         "text-align: center;\">\n" +
                                         post.originator +
                                         " is ignored. " +
