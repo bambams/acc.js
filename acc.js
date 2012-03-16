@@ -384,15 +384,17 @@ if(typeof jQuery != "undefined")
             {
                 jQuery(function() {
                     jQuery(".post.m" + id)
-                            .css("display", "none")
+                            .css("visibility", "hidden")
                             .each(function() {
                                 var e = jQuery(this);
                                 var post = bam.getPost(e);
 
-                                e.after("<div class=\"ignored " +
+                                e.before("<div class=\"ignored " +
                                         post.id +
                                         "\" style=\"" +
                                         "background-color: #e1c896;" +
+                                        "top: 0em;" +
+                                        "position: relative;" +
                                         "text-align: center;\">\n" +
                                         post.originator +
                                         " is ignored. " +
@@ -530,7 +532,7 @@ if(typeof jQuery != "undefined")
             {
                 e = this.getPostElement(e);
 
-                e.css("display", "");
+                e.css("visibility", "");
 
                 var post = this.getPost(e);
 
