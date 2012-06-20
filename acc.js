@@ -702,6 +702,52 @@ if(typeof jQuery != "undefined")
             e.css("width", "80em !important")
                     .css("white-space", "pre-wrap !important");
         });
+
+        // Add h4x button to show spoilers in read private messages
+        // because the A.cc UI doesn't seem to show up, rendering them
+        // inaccessible short of scripting hacks.
+        (function() {
+            if(/\/pm\/read/.test(window.location))
+            {
+                var getNextId = (function() {
+                    var id = 0;
+
+                    return function() {
+                        return id++;
+                    };
+                })();
+
+                // h4x: Poll once a second, since A.cc seems to build the DOM
+                // dynamically on-demand, and I don't know what, if anything,
+                // I can hook into that.
+                var interval = setInterval(function() {
+                    var spoilers = jQuery(".spoiler");
+
+                    spoilers.each(function() {
+                        var e = jQuery(this);
+                        var id = e.attr("id");
+
+                        if(id == null || id == "")
+                        {
+                            e.attr("id", "spoiler" + getNextId());
+                        }
+
+                        if(jQuery("button#" + e.attr("id")).length == 0)
+                        {
+                            var button = jQuery("<button type='button'>Show Spoiler</button>");
+
+                            button.click(function() {
+                                e.show();
+                            });
+
+                            button.attr("id", e.attr("id"));
+
+                            e.before(button);
+                        }
+                    });
+                }, 1000);
+            }
+        })();
     });
 }
 
