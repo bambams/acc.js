@@ -612,6 +612,9 @@ if(typeof jQuery != "undefined")
          */
         bam.stopAudio("#vuvuzela");
 
+        // Also stop the USA anthem. Gets old. ;)
+        bam.stopAudio("#usa-anthem");
+
         /*
          * Navigation menu width. Wider to avoid moving content down (it can
          * be annoying when you're trying to click and link and it suddently
