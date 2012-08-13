@@ -539,6 +539,16 @@ if(typeof jQuery != "undefined")
                 jQuery(".ignored." + post.id).remove();
             },
 
+        stopAudio:
+            function(e)
+            {
+                jQuery(e).each(function() {
+                    if(typeof this.pause == "function")
+                        this.pause();
+                    this.currentTime = 0;
+                });
+            },
+
         stripReferenceBlock:
             function(e)
             {
@@ -600,11 +610,7 @@ if(typeof jQuery != "undefined")
          * Stop the annoying vuvuzela sound (probably only needed
          * temporarily). ;)
          */
-        jQuery("#vuvuzela").each(function() {
-            if(typeof this.pause == "function")
-                this.pause();
-            this.currentTime = 0;
-        });
+        bam.stopAudio("#vuvuzela");
 
         /*
          * Navigation menu width. Wider to avoid moving content down (it can
