@@ -394,7 +394,6 @@ if(typeof jQuery != "undefined")
                 return q;
             },
 
-
         htmlDecode:
             function(s)
             {
@@ -719,7 +718,7 @@ if(typeof jQuery != "undefined")
                         + (what || "something") +
                         " from server...</div>";
                 var loadDialog;
-                
+
                 jQuery(document.body).append(html);
 
                 loadDialog = jQuery(document.body).find(
