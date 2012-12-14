@@ -53,6 +53,7 @@ if(typeof jQuery != "undefined")
     bam = {
         configHtml: null,
         exceptionDialogCount: 0,
+        baseTemplateUri: "http://castopulence.org/accjs/tmpl",
 
         cloneBr:
             function(e)
@@ -252,6 +253,39 @@ if(typeof jQuery != "undefined")
 
                 window.location.href = "data:application/zip;base64," +
                         content;
+            },
+
+    embedTemplates:
+            function()
+            {
+                var self = this;
+
+                jQuery(function() {
+                    var templates = [
+                        "exception.tmpl",
+                        "ignoredMember.tmpl",
+                        "loading.tmpl",
+                        "navext.tmpl",
+                        "post-header.tmpl",
+                        "quote.tmpl",
+                        "styles.tmpl"
+                    ];
+
+                    for(var i=0, l=templates.length; i<l; i++)
+                    {
+                        var n = templates[i];
+
+                        jQuery(document.body).append(
+                                "<script id='" +
+                                n +
+                                "' type='text/plain' " +
+                                "src='" +
+                                self.baseTemplateUri +
+                                "/" +
+                                n +
+                                "'></script>");
+                    }
+                });
             },
 
         getConfigDialog:
