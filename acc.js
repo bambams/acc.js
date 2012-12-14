@@ -406,6 +406,175 @@ if(typeof jQuery != "undefined")
                 });
             },
 
+        install:
+            function()
+            {
+                jQuery(function() {
+                    //bam.embedTemplates();
+
+                    /*
+                     * Stop the annoying vuvuzela sound (probably only
+                     * needed temporarily). ;)
+                     */
+                    bam.stopAudio("#vuvuzela");
+
+                    // Also stop the USA anthem. Gets old. ;)
+                    bam.stopAudio("#usa-anthem");
+
+                    // Add 'load' date/time.
+                    var date = jQuery("<span>");
+                    date.text(new Date().toString());
+                    jQuery(".forum-page-numbers").prepend(date);
+
+                    /*
+                     * Navigation menu width. Wider to avoid moving
+                     * content down (it can be annoying when you're trying
+                     * to click and link and it suddently jolts down as
+                     * this JS runs in the background). Of course, on
+                     * smaller screens, this can be a problem. Maybe
+                     * eventually support can be added for a configuration
+                     * menu to control this.
+                     */
+                    jQuery("table[summary='forum header'] " +
+                            "td:nth-child(2)").width(750);
+
+                    jQuery(document.body)
+                            .prepend("<div id=\"bam-top\"></div>");
+
+                    // Navigation menu additions.
+                    jQuery("#forum-navigation").find("a:nth-child(5)").after(
+                            " | <a " +
+                            "href=\"/cc/theme-css\" " +
+                            "title=\"View/edit my custom CSS/JS.\">css/js</a> | " +
+                            "<a " +
+                            "href=\"https://www.allegro.cc/pm\" " +
+                            "id=\"my-inbox-link\" " +
+                            "title=\"Your private message inbox.\">inbox</a> | " +
+                            "<a " +
+                            "href=\"https://www.allegro.cc/pm/list/outbox\" " +
+                            "id=\"my-outbox-link\" " +
+                            "title=\"Your private message outbox.\">outbox</a> | " +
+                            "<a " +
+                            "href=\"http://www.allegro.cc/pm/compose/\" " +
+                            "id=\"my-compose-link\" " +
+                            "title=\"Compose a new private message.\">compose</a> | " +
+                            "<a " +
+                            "href=\"/cc/forums-settings\" " +
+                            "id=\"my-settings-link\" " +
+                            "title=\"View/edit your forum settings.\">settings</a> | " +
+                            "<a " +
+                            "id=\"my-config-link\" " +
+                            "title=\"View/edit your acc.js configuration.\">config</a>");
+
+                    jQuery("#my-config-link").click(function() {
+                        bam.showConfig();
+                    });
+
+                    // Last-read and Top links.
+                    jQuery("#thread-list").find("span.topic a").each(function() {
+                        var e = jQuery(this);
+                        var clone = e.clone();
+                        var l = e.parents("div.topic").find("> a:last-child");
+
+                        if(l.length == 0)
+                            l = e;
+
+                        clone.text("Top");
+                        clone.attr("style", clone.attr("style") +
+                                "; float: right; margin-right: 1em;");
+
+                        e.attr("href", l.attr("href") + "#last_read");
+                        e.after(clone);
+                    });
+
+                    // Post header additions.
+                    jQuery("#thread .post").each(function(E) {
+                        var o = bam.getPost(jQuery(this));
+
+                        o.header.append("<a href=\"#post_form\" " +
+                                "title=\"Jump to the mockup box.\">Mockup</a> " +
+                                "<a href=\"javascript:bam.quote(" +
+                                o.id +
+                                ");\" title=\"Quote this post.\">Quote</a> " +
+                                "<a href=\"/pm/compose/" +
+                                o.memberNumber +
+                                "\" title=\"Send a private message to " +
+                                o.originator +
+                                ".\">PM</a> " +
+                                "<a href=\"javascript:bam.stub(" +
+                                o.id +
+                                ");\" title=\"Stub quote this post.\">Stub</a> " +
+                                "<a href=\"#bam-top\" " +
+                                "title=\"Jump to the top of the page.\">Top</a> " +
+                                "<a href=\"javascript:bam.downloadCodeZip(" +
+                                o.id +
+                                ");\" title=\"Download a zip file with all named " +
+                                "code tags as its contents.\">Zip</a>");
+                    });
+
+                    // Add title attribute to cusses. ;)
+                    jQuery("span.cuss").each(function() {
+                        var e = jQuery(this);
+
+                        e.attr("title", e.text());
+                    });
+
+                    // Wrap terminal at 80 characters.
+                    jQuery("pre.terminal").each(function() {
+                        var e = jQuery(this);
+
+                        e.css("width", "80em !important")
+                                .css("white-space", "pre-wrap !important");
+                    });
+
+                    // Add h4x button to show spoilers in read private messages
+                    // because the A.cc UI doesn't seem to show up, rendering them
+                    // inaccessible short of scripting hacks.
+                    (function() {
+                        if(/\/pm\/read/.test(window.location))
+                        {
+                            var getNextId = (function() {
+                                var id = 0;
+
+                                return function() {
+                                    return id++;
+                                };
+                            })();
+
+                            // h4x: Poll once a second, since A.cc seems to build the DOM
+                            // dynamically on-demand, and I don't know what, if anything,
+                            // I can hook into that.
+                            var interval = setInterval(function() {
+                                var spoilers = jQuery(".spoiler");
+
+                                spoilers.each(function() {
+                                    var e = jQuery(this);
+                                    var id = e.attr("id");
+
+                                    if(id == null || id == "")
+                                    {
+                                        e.attr("id", "spoiler" + getNextId());
+                                    }
+
+                                    if(jQuery("button#" + e.attr("id")).length == 0)
+                                    {
+                                        var button = jQuery("<button type='button'>Show Spoiler</button>");
+
+                                        button.click(function() {
+                                            e.show();
+                                        });
+
+                                        button.attr("id", e.attr("id"));
+
+                                        e.before(button);
+                                    }
+                                });
+                            }, 1000);
+                        }
+                    })();
+                });
+            },
+
         quote:
             function(id)
             {
@@ -603,160 +772,5 @@ if(typeof jQuery != "undefined")
                         e.val(e.val().trim());
                 });
             }
-    }
-
-    jQuery(function() {
-        /*
-         * Stop the annoying vuvuzela sound (probably only needed
-         * temporarily). ;)
-         */
-        bam.stopAudio("#vuvuzela");
-
-        // Also stop the USA anthem. Gets old. ;)
-        bam.stopAudio("#usa-anthem");
-
-        /*
-         * Navigation menu width. Wider to avoid moving content down (it can
-         * be annoying when you're trying to click and link and it suddently
-         * jolts down as this JS runs in the background). Of course, on
-         * smaller screens, this can be a problem. Maybe eventually support
-         * can be added for a configuration menu to control this.
-         */
-        jQuery("table[summary='forum header'] td:nth-child(2)").width(750);
-
-        jQuery(document.body).prepend("<div id=\"bam-top\"></div>");
-
-        // Navigation menu additions.
-        jQuery("#forum-navigation").find("a:nth-child(5)").after(
-                " | <a " +
-                "href=\"/cc/theme-css\" " +
-                "title=\"View/edit my custom CSS/JS.\">css/js</a> | " +
-                "<a " +
-                "href=\"https://www.allegro.cc/pm\" " +
-                "id=\"my-inbox-link\" " +
-                "title=\"Your private message inbox.\">inbox</a> | " +
-                "<a " +
-                "href=\"https://www.allegro.cc/pm/list/outbox\" " +
-                "id=\"my-outbox-link\" " +
-                "title=\"Your private message outbox.\">outbox</a> | " +
-                "<a " +
-                "href=\"http://www.allegro.cc/pm/compose/\" " +
-                "id=\"my-compose-link\" " +
-                "title=\"Compose a new private message.\">compose</a> | " +
-                "<a " +
-                "href=\"/cc/forums-settings\" " +
-                "id=\"my-settings-link\" " +
-                "title=\"View/edit your forum settings.\">settings</a> | " +
-                "<a " +
-                "id=\"my-config-link\" " +
-                "title=\"View/edit your acc.js configuration.\">config</a>");
-
-        jQuery("#my-config-link").click(function() {
-            bam.showConfig();
-        });
-
-        // Last-read and Top links.
-        jQuery("#thread-list").find("span.topic a").each(function() {
-            var e = jQuery(this);
-            var clone = e.clone();
-            var l = e.parents("div.topic").find("> a:last-child");
-
-            if(l.length == 0)
-                l = e;
-
-            clone.text("Top");
-            clone.attr("style", clone.attr("style") +
-                    "; float: right; margin-right: 1em;");
-
-            e.attr("href", l.attr("href") + "#last_read");
-            e.after(clone);
-        });
-
-        // Post header additions.
-        jQuery("#thread .post").each(function(E) {
-            var o = bam.getPost(jQuery(this));
-
-            o.header.append("<a href=\"#post_form\" " +
-                    "title=\"Jump to the mockup box.\">Mockup</a> " +
-                    "<a href=\"javascript:bam.quote(" +
-                    o.id +
-                    ");\" title=\"Quote this post.\">Quote</a> " +
-                    "<a href=\"/pm/compose/" +
-                    o.memberNumber +
-                    "\" title=\"Send a private message to " +
-                    o.originator +
-                    ".\">PM</a> " +
-                    "<a href=\"javascript:bam.stub(" +
-                    o.id +
-                    ");\" title=\"Stub quote this post.\">Stub</a> " +
-                    "<a href=\"#bam-top\" " +
-                    "title=\"Jump to the top of the page.\">Top</a> " +
-                    "<a href=\"javascript:bam.downloadCodeZip(" +
-                    o.id +
-                    ");\" title=\"Download a zip file with all named " +
-                    "code tags as its contents.\">Zip</a>");
-        });
-
-        // Add title attribute to cusses. ;)
-        jQuery("span.cuss").each(function() {
-            var e = jQuery(this);
-
-            e.attr("title", e.text());
-        });
-
-        // Wrap terminal at 80 characters.
-        jQuery("pre.terminal").each(function() {
-            var e = jQuery(this);
-
-            e.css("width", "80em !important")
-                    .css("white-space", "pre-wrap !important");
-        });
-
-        // Add h4x button to show spoilers in read private messages
-        // because the A.cc UI doesn't seem to show up, rendering them
-        // inaccessible short of scripting hacks.
-        (function() {
-            if(/\/pm\/read/.test(window.location))
-            {
-                var getNextId = (function() {
-                    var id = 0;
-
-                    return function() {
-                        return id++;
-                    };
-                })();
-
-                // h4x: Poll once a second, since A.cc seems to build the DOM
-                // dynamically on-demand, and I don't know what, if anything,
-                // I can hook into that.
-                var interval = setInterval(function() {
-                    var spoilers = jQuery(".spoiler");
-
-                    spoilers.each(function() {
-                        var e = jQuery(this);
-                        var id = e.attr("id");
-
-                        if(id == null || id == "")
-                        {
-                            e.attr("id", "spoiler" + getNextId());
-                        }
-
-                        if(jQuery("button#" + e.attr("id")).length == 0)
-                        {
-                            var button = jQuery("<button type='button'>Show Spoiler</button>");
-
-                            button.click(function() {
-                                e.show();
-                            });
-
-                            button.attr("id", e.attr("id"));
-
-                            e.before(button);
-                        }
-                    });
-                }, 1000);
-            }
-        })();
-    });
+    };
 }
-
