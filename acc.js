@@ -120,7 +120,7 @@ if(typeof jQuery != "undefined")
                 mockup.find("img").each(function() {
                     var e = jQuery(this);
 
-                    if(/^https?:\/\/www\.allegro\.cc\/forums\/smileys\//.test(
+                    if(/^(https?:\/\/www\.allegro\.cc)?\/forums\/smileys\//.test(
                             e.attr("src")))
                     {
                         bam.cloneSmiley(e);
