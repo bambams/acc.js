@@ -27,10 +27,19 @@ http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js
 http://www.castopulence.org/js/jszip.js
 http://www.castopulence.org/js/acc.min.js
 
+You must now invoke bam.install() in order for acc.js to actually be
+executed now (perhaps it should be in a bam.accjs namespace..). This is
+more or less just the "always run" stuff. You can still invoke individual
+methods manually, of course.
+
+I noticed recently that certain things weren't working properly anymore.
+It turns out that somehow jQuery is still conflicting with Prototype,
+despite acc.js calling jQuery.noConflict(). I can't explain it, but adding
+an additional jQuery.noConflict() call in my inline code seems to resolve
+this again.
+
 As one might expect, it comes with NO WARRANTY, etc. USE AT OWN RISK.
 Also note that it may periodically break as I develop live so you
 might experience issues on http://www.allegro.cc if you're hotlinking
 (or otherwise using a broken version). ^_^ I am not to be held liable
 for this.
-
-
