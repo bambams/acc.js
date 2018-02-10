@@ -7,8 +7,8 @@
  * distribute it; but I ask that if you do copy or modify it, you leave
  * this copyright notice intact.
  *
- * Original location: http://www.castopulence.org/js/acc.js
- * Minified: http://www.castopulence.org/js/acc.min.js
+ * Original location: https://www.castopulence.org/js/acc.js
+ * Minified (lies): https://www.castopulence.org/js/acc.min.js
  *
  * It depends on jQuery and jQuery UI. Be sure to add both
  * to the list of external JavaScript scripts before this script. A
@@ -18,9 +18,9 @@
  * For example, add the following lines to your external JavaScript
  * script list:
  *
- * http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js
- * http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js
- * http://www.castoulence.org/js/acc.min.js
+ * https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js
+ * https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js
+ * https://www.castopulence.org/js/acc.min.js
  *
  * As one might expect, it comes with NO WARRANTY, etc. USE AT OWN RISK.
  * Also note that it may periodically break as I develop live so you
