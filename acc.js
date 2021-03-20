@@ -28,10 +28,9 @@
  * https://www.castopulence.org/js/jszip.js
  * https://www.castopulence.org/js/acc.min.js
  * 
- * You must now invoke bam.install() in order for acc.js to actually be
- * executed now (perhaps it should be in a bam.accjs namespace..). This is
- * more or less just the "always run" stuff. You can still invoke individual
- * methods manually, of course.
+ * You must now invoke bam.accjs.install() in order for acc.js to actually be
+ * executed now. This is more or less just the "always run" stuff. You can
+ * still invoke individual methods manually, of course.
  * 
  * As one might expect, it comes with NO WARRANTY, etc. USE AT OWN RISK. Also
  * note that it may periodically break as I develop live so you might
