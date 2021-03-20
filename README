@@ -2,12 +2,12 @@ A custom JS script to enhance http://www.allegro.cc forums.
 Copyright © 2010, 2012, 2013, 2018, 2021 Brandon McCaig
 
 This script is used to "enhance" the user experience on the forums at
-http://www.allegro.cc. You may hotlink it[1], copy it, modify it, or
-distribute it; but I ask that if you do copy or modify it, you leave
-this copyright notice intact.
+https://www.allegro.cc. You may hotlink it[1], copy it, modify it, or
+distribute it; but I ask that if you do copy or modify it, you leave this
+copyright notice intact and note your changes in a separate file (e.g.,
+README.forkname).
 
-Original location: http://www.castopulence.org/js/acc.js
-Minified: http://www.castopulence.org/js/acc.min.js
+    https://www.castopulence.org/js/acc.dev.js
 
 It depends on jQuery and jQuery UI. Be sure to add both
 to the list of external JavaScript scripts before this script. A
@@ -22,24 +22,18 @@ I do :P).
 For example, add the following lines to your external JavaScript
 script list:
 
-http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js
-http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js
-http://www.castopulence.org/js/jszip.js
-http://www.castopulence.org/js/acc.min.js
+https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js
+https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js
+https://www.castopulence.org/js/jszip.js
+https://www.castopulence.org/js/acc.min.js
 
 You must now invoke bam.install() in order for acc.js to actually be
 executed now (perhaps it should be in a bam.accjs namespace..). This is
 more or less just the "always run" stuff. You can still invoke individual
 methods manually, of course.
 
-I noticed recently that certain things weren't working properly anymore.
-It turns out that somehow jQuery is still conflicting with Prototype,
-despite acc.js calling jQuery.noConflict(). I can't explain it, but adding
-an additional jQuery.noConflict() call in my inline code seems to resolve
-this again.
-
 As one might expect, it comes with NO WARRANTY, etc. USE AT OWN RISK.
 Also note that it may periodically break as I develop live so you
-might experience issues on http://www.allegro.cc if you're hotlinking
+might experience issues on https://www.allegro.cc if you're hotlinking
 (or otherwise using a broken version). ^_^ I am not to be held liable
-for this.
+for this. Host your own copy to avoid such breakage.
