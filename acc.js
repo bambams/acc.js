@@ -143,7 +143,9 @@ if (typeof jQuery != "undefined") {
     "cloneQuote": function (e) {
       e.replaceWith(function () {
         const fmt = "<quote{name}{src}>{body}</quote>\n",
-              name_attr = quote.name ? " name=\"" + bam.accjs.htmlEncode(quote.name) + "\"" : "",
+              name_attr = quote.name ?
+                  ` name="${bam.accjs.htmlEncode(quote.name)}"` :
+                  "",
               quote = bam.accjs.getQuote(jQuery(this));
 
         return fmt
