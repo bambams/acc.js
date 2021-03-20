@@ -4,9 +4,9 @@
  * 
  * This script is used to "enhance" the user experience on the forums at
  * https://www.allegro.cc/. You may hotlink it, copy it, modify it, or
- * distribute it; but I ask that if you do copy or modify it, you leave
- * this copyright notice intact and note your changes in a separate file
- * (e.g., README.forkname).
+ * distribute it; but I ask that if you do copy or modify it, you leave this
+ * copyright notice intact and note your changes in a separate file (e.g.,
+ * README.forkname).
  * 
  *   Hosted version:    https://www.castopulence.org/js/acc.js
  *   Minfied (maybe):   https://www.castopulence.org/js/acc.min.js
@@ -14,13 +14,12 @@
  * 
  * It depends on jQuery and jQuery UI. Be sure to add both to the list of
  * external JavaScript scripts before this script. A convenient way is by
- * using the Google API servers, which Google encourages you to do
- * anyway[1].
+ * using the Google API servers, which Google encourages you to do anyway[1].
  * 
- * It also [optionally] depends on jszip, which is used to turn named
- * <code> blocks into a zip file with the file contents. You only need
- * jszip if you intend to use this (not too many people name their <code>
- * tags anyway, but I do :P).
+ * It also [optionally] depends on jszip, which is used to turn named <code>
+ * blocks into a zip file with the file contents. You only need jszip if you
+ * intend to use this (not too many people name their <code> tags anyway, but
+ * I do :P).
  * 
  * For example, add the following lines to your external JavaScript script
  * list:
@@ -32,11 +31,11 @@
  * 
  * You must now invoke bam.install() in order for acc.js to actually be
  * executed now (perhaps it should be in a bam.accjs namespace..). This is
- * more or less just the "always run" stuff. You can still invoke
- * individual methods manually, of course.
+ * more or less just the "always run" stuff. You can still invoke individual
+ * methods manually, of course.
  * 
- * As one might expect, it comes with NO WARRANTY, etc. USE AT OWN RISK.
- * Also note that it may periodically break as I develop live so you might
+ * As one might expect, it comes with NO WARRANTY, etc. USE AT OWN RISK. Also
+ * note that it may periodically break as I develop live so you might
  * experience issues on https://www.allegro.cc/ if you're hotlinking (or
  * otherwise using a broken version). ^_^ I am not to be held liable for
  * this. Host your own copy to avoid such breakage.
