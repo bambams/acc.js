@@ -1,6 +1,6 @@
 /*
  * A custom JS script to enhance http://www.allegro.cc forums.
- * Copyright © 2010 Brandon McCaig
+ * Copyright © 2010, 2012, 2013, 2018, 2021 Brandon McCaig
  *
  * This script is used to "enhance" the user experience on the forums at
  * http://www.allegro.cc. You may hotlink it[1], copy it, modify it, or
