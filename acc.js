@@ -4,9 +4,8 @@
  * 
  * This script is used to "enhance" the user experience on the forums at
  * https://www.allegro.cc/. You may hotlink it, copy it, modify it, or
- * distribute it; but I ask that if you do copy or modify it, you leave this
- * copyright notice intact and note your changes in a separate file (e.g.,
- * README.forkname).
+ * distribute it; but I ask that if you do distribute it, you leave this
+ * notice intact and note your changes after it).
  * 
  *   Hosted version:    https://www.castopulence.org/js/acc.js
  *   Minfied (maybe):   https://www.castopulence.org/js/acc.min.js
