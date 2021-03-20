@@ -63,7 +63,7 @@ if (typeof jQuery != "undefined") {
       jQuery("head").append(stylesheets);
     },
 
-    "baseTemplateUri": "http://castopulence.org/accjs/tmpl",
+    "baseTemplateUri": "https://castopulence.org/accjs/tmpl",
     "configHtml": null,
     "exceptionDialogCount": 0,
 
@@ -426,7 +426,7 @@ if (typeof jQuery != "undefined") {
 | <a href="/cc/theme-css" title="View/edit my custom CSS/JS.">css/js</a>
 | <a href="https://www.allegro.cc/pm" id="my-inbox-link" title="Your private message inbox.">inbox</a>
 | <a href="https://www.allegro.cc/pm/list/outbox" id="my-outbox-link" title="Your private message outbox.">outbox</a>
-| <a href="http://www.allegro.cc/pm/compose/" id="my-compose-link" title="Compose a new private message.">compose</a>
+| <a href="https://www.allegro.cc/pm/compose/" id="my-compose-link" title="Compose a new private message.">compose</a>
 | <a href="/cc/forums-settings" id="my-settings-link" title="View/edit your forum settings.">settings</a>
 | <a id="my-config-link" title="View/edit your acc.js configuration.">config</a>`
 
