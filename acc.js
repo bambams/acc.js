@@ -3,43 +3,43 @@
 /*
  * A custom JS script to enhance https://www.allegro.cc/ forums.
  * Copyright © 2010, 2012-2013, 2018, 2021 Brandon McCaig
- * 
+ *
  * This script is used to "enhance" the user experience on the forums at
  * https://www.allegro.cc/. You may hotlink it, copy it, modify it, or
  * distribute it; but I ask that if you do distribute it, you leave this
  * notice intact and note your changes after it).
- * 
+ *
  *   Hosted version:    https://www.castopulence.org/js/acc.js
  *   Minfied (maybe):   https://www.castopulence.org/js/acc.min.js
  *   Bleeding edge:     https://www.castopulence.org/js/acc.dev.js
- * 
+ *
  * It depends on jQuery and jQuery UI. Be sure to add both to the list of
  * external JavaScript scripts before this script. A convenient way is by
  * using the Google API servers, which Google encourages you to do anyway[1].
- * 
+ *
  * It also [optionally] depends on jszip, which is used to turn named <code>
  * blocks into a zip file with the file contents. You only need jszip if you
  * intend to use this (not too many people name their <code> tags anyway, but
  * I do :P).
- * 
+ *
  * For example, add the following lines to your external JavaScript script
  * list:
- * 
+ *
  * https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js
  * https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js
  * https://www.castopulence.org/js/jszip.js
  * https://www.castopulence.org/js/acc.min.js
- * 
+ *
  * You must now invoke bam.accjs.install() in order for acc.js to actually be
  * executed now. This is more or less just the "always run" stuff. You can
  * still invoke individual methods manually, of course.
- * 
+ *
  * As one might expect, it comes with NO WARRANTY, etc. USE AT OWN RISK. Also
  * note that it may periodically break as I develop live so you might
  * experience issues on https://www.allegro.cc/ if you're hotlinking (or
  * otherwise using a broken version). ^_^ I am not to be held liable for
  * this. Host your own copy to avoid such breakage.
- * 
+ *
  * [1] https://code.google.com/apis/ajaxlibs/documentation/
  */
 
@@ -48,20 +48,33 @@ const GLOBAL = window;
 // It appears that jQuery is currently conflicting with A.cc in some way.
 // So I'll wrap the script so that it doesn't error without jQuery.
 if (typeof jQuery != "undefined") {
+  function log (level, ...args) {
+    try {
+      console[level] &&
+          console[level].apply(console, args);
+    } catch (e) {}
+  }
+
+  log('debug', "bam.accjs calling jQuery.noConflict().");
   jQuery.noConflict();
 
   if (!GLOBAL.hasOwnProperty("bam")) {
+    log('debug', "Initializing parent 'bam' namespace object in global scope from bam.accjs (acc.js).");
     bam = {};
   }
 
   bam.accjs = {
     "addStylesheets": function () {
-      const stylesheets = `
-          <link rel="stylesheet" type="text/css" "href="https://www.castopulence.org/js/acc.css" />
-          <link rel="stylesheet" type="text/css" "href="https://www.castopulence.org/js/jquery-ui.css" />
-          `;
+      return this.wrapGroup("bam.accjs.addStylesheets", () => {
+          const stylesheets = `
+              <link rel="stylesheet" type="text/css" "href="https://www.castopulence.org/js/acc.css" />
+              <link rel="stylesheet" type="text/css" "href="https://www.castopulence.org/js/jquery-ui.css" />
+              `;
 
-      jQuery("head").append(stylesheets);
+          this.log('debug', "bam.accjs is installing stylesheets into the document <head>.");
+          this.log('debug', stylesheets);
+          jQuery("head").append(stylesheets);
+      });
     },
 
     "baseTemplateUri": "https://castopulence.org/accjs/tmpl",
@@ -69,33 +82,42 @@ if (typeof jQuery != "undefined") {
     "exceptionDialogCount": 0,
 
     "cloneBr": function (e) {
-      e.replaceWith(function () {
-        return "\n";
+      return this.wrapGroup("cloneBr", () => {
+        this.log('debug', "cloneBr on %o", e);
+        e.replaceWith(() => "\n");
       });
     },
 
     "cloneCode": function (e) {
-      e.replaceWith(function () {
-        const e = jQuery(this),
-              newline = e.hasClass("snippet") ? "\n" : "";
+      this.wrapGroup('"cloneCode", () => {
+        console.debug && console.debug("cloneCode on %o", e);
+        e.replaceWith(function () {
+          const e = jQuery(this),
+                newline = e.hasClass("snippet") ? "\n" : "";
 
-        return `<code>${newline}${e.text().trim()}${newline}</code>`;
+          return `<code>${newline}${e.text().trim()}${newline}</code>`;
+        });
       });
     },
 
     "cloneCuss": function (e) {
-      e.replaceWith(function () {
-        return jQuery(this).text();
+      this.wrapGroup("cloneCuss", () => {
+        this.log('debug', "cloneCuss on %o", e);
+        e.replaceWith(function () {
+          return jQuery(this).text();
+        });
       });
     },
 
     "cloneParagraph": function (e) {
+      this.log('debug', "cloneParagraph on %o", e);
       e.replaceWith(function () {
         return jQuery(this).html() + "\n\n";
       });
     },
 
     "clonePost": function (post) {
+      console.debug && console.debug("clonePost on %o", post);
       const mockup = post.mockup.clone();
 
       this.stripUrlDisclaimers(mockup);
@@ -195,6 +217,11 @@ if (typeof jQuery != "undefined") {
 
     "closeDialog": function (dialog) {
       jQuery(dialog).dialog("destroy");
+    },
+
+    "log": function (level, ...args) {
+      args.splice(0, 0, level);
+      log.apply(GLOBAL, args);
     },
 
     "downloadCodeZip": function (e) {
@@ -691,6 +718,18 @@ ${source}
           e.val(e.val().trim());
         }
       });
+    },
+    "wrapGroup": function (name, action) {
+      const exists = !!(console.group && console.groupEnd);
+      if (!exists) {
+        return action();
+      }
+      console.group(name);
+      try {
+        return action();
+      } finally {
+        console.groupEnd();
+      }
     }
   };
 
