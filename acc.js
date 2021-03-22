@@ -43,12 +43,14 @@
  * [1] https://code.google.com/apis/ajaxlibs/documentation/
  */
 
+const GLOBAL = window;
+
 // It appears that jQuery is currently conflicting with A.cc in some way.
 // So I'll wrap the script so that it doesn't error without jQuery.
 if (typeof jQuery != "undefined") {
   jQuery.noConflict();
 
-  if (!window.hasOwnProperty("bam")) {
+  if (!GLOBAL.hasOwnProperty("bam")) {
     bam = {};
   }
 
@@ -292,7 +294,7 @@ if (typeof jQuery != "undefined") {
           }
         };
 
-        if (window.Ajax && typeof Ajax.Request === "function") {
+        if (GLOBAL.Ajax && typeof Ajax.Request === "function") {
           new Ajax.Request("https://www.castopulence.org/js/config.txt", options);
         } else {
           const msg = "Cannot load config dialog because Ajax.Request is not defined.";
