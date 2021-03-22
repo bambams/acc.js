@@ -1,3 +1,5 @@
+"use strict";
+
 /*
  * A custom JS script to enhance https://www.allegro.cc/ forums.
  * Copyright © 2010, 2012-2013, 2018, 2021 Brandon McCaig
@@ -376,7 +378,7 @@ if (typeof jQuery != "undefined") {
                     post = bam.accjs.getPost(e),
                     html = `
 <div class="ignored ${post.id}" style="background-color: #e1c896;top: 0em;position: relative;text-align: center;">
-  ${post.originator} is ignored. (<a href="javascript:bam.accjs.showPost(post.id);">Show post.</a>)
+  ${post.originator} is ignored. (<a href="javascript:bam.accjs.showPost(${post.id});">Show post.</a>)
 </div>`;
 
               e.before(html);
