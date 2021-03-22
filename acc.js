@@ -142,19 +142,16 @@ if (typeof jQuery != "undefined") {
 
     "cloneQuote": function (e) {
       e.replaceWith(function () {
-        const fmt = "<quote{name}{src}>{body}</quote>\n",
-              name_attr = quote.name ?
-                  ` name="${bam.accjs.htmlEncode(quote.name)}"` :
-                  "",
-              quote = bam.accjs.getQuote(jQuery(this));
+        const quote = bam.accjs.getQuote(jQuery(this)),
+              name_attr = attr("name", quote.name),
+              src_attr = attr("src", quote.src),
+              body = quote.body,
+              html = `<quote${name_attr}${src_attr}>${body}</quote>\n`;
 
-        return fmt
-            .replace("{name}", nameAttr)
-            .replace("{src}", )
-            .replace("{body}", quote.body);
+        return html;
 
         function attr (name, value) {
-          if (!quote.src) {
+          if (!value) {
             return "";
           }
 
